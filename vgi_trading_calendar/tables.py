@@ -3,7 +3,7 @@
 These expand to **many rows**, so they are exposed as **table functions** -- the
 form that accepts DuckDB ``name := value`` arguments (``exchange``). The
 per-row, single-value trading functions (``is_trading_day``, ``market_open``,
-...) are *scalars* and live in :mod:`vgi_trading_calendar.trading_scalars`.
+...) are *scalars* and live in :mod:`vgi_trading_calendar.scalars`.
 
     SELECT * FROM tcal.trading_sessions(DATE '2026-01-01', DATE '2026-01-31');
     SELECT * FROM tcal.trading_schedule(DATE '2026-11-25', DATE '2026-11-30', exchange := 'XNYS');
@@ -29,18 +29,18 @@ from vgi.table_function import (
 )
 from vgi_rpc.rpc import OutputCollector
 
-from . import trading
+from . import core
 from .meta import object_tags
 from .schema_utils import field
 
-_SRC = "trading_tables.py"
+_SRC = "tables.py"
 
 _TZ_TS = pa.timestamp("us", tz="UTC")
 _EXCHANGE = Arg[str](
     "exchange",
-    default=trading.DEFAULT_EXCHANGE,
+    default=core.DEFAULT_EXCHANGE,
     doc="Exchange MIC code (e.g. 'XNYS', 'XLON'). See tcal.exchanges.",
-    choices=trading.list_exchanges(),
+    choices=core.list_exchanges(),
 )
 
 
@@ -120,7 +120,7 @@ class TradingSessionsFunction(TableFunctionGenerator[_TradingSessionsArgs]):
     def process(cls, params: ProcessParams[_TradingSessionsArgs], state: None, out: OutputCollector) -> None:
         """Emit the function's output rows into the collector."""
         a = params.args
-        days = trading.trading_sessions_in_range(a.start, a.end, a.exchange)
+        days = core.trading_sessions_in_range(a.start, a.end, a.exchange)
         out.emit(pa.RecordBatch.from_pydict({"date": days}, schema=params.output_schema))
         out.finish()
 
@@ -208,7 +208,7 @@ class TradingScheduleFunction(TableFunctionGenerator[_TradingScheduleArgs]):
     def process(cls, params: ProcessParams[_TradingScheduleArgs], state: None, out: OutputCollector) -> None:
         """Emit the function's output rows into the collector."""
         a = params.args
-        rows = trading.trading_schedule(a.start, a.end, a.exchange)
+        rows = core.trading_schedule(a.start, a.end, a.exchange)
         out.emit(
             pa.RecordBatch.from_pydict(
                 {
@@ -294,14 +294,14 @@ class ExchangesFunction(TableFunctionGenerator[_NoArgs]):
     @classmethod
     def process(cls, params: ProcessParams[_NoArgs], state: None, out: OutputCollector) -> None:
         """Emit the function's output rows into the collector."""
-        out.emit(pa.RecordBatch.from_pydict({"code": trading.list_exchanges()}, schema=params.output_schema))
+        out.emit(pa.RecordBatch.from_pydict({"code": core.list_exchanges()}, schema=params.output_schema))
         out.finish()
 
 
 # NB: ExchangesFunction is intentionally NOT registered as a standalone table
 # function — it backs the scan `Table(name="exchanges", …)` in calendar_worker.py,
 # so the exchange MIC codes are exposed once, as a plain table (no parens).
-TRADING_TABLE_FUNCTIONS: list[type] = [
+TABLE_FUNCTIONS: list[type] = [
     TradingSessionsFunction,
     TradingScheduleFunction,
 ]

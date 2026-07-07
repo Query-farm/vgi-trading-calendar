@@ -17,7 +17,7 @@ a second arity overload that shares the function name; it defaults to ``'XNYS'``
 
 Set-returning trading functions (``trading_sessions``, ``trading_schedule``,
 ``exchanges``) take named arguments and live in
-:mod:`vgi_trading_calendar.trading_tables`.
+:mod:`vgi_trading_calendar.tables`.
 """
 
 from __future__ import annotations
@@ -29,17 +29,17 @@ from vgi.arguments import ConstParam, Param, Returns
 from vgi.metadata import FunctionExample
 from vgi.scalar_function import ScalarFunction
 
-from . import trading
+from . import core
 from .meta import object_tags
 
-_SRC = "trading_scalars.py"
+_SRC = "scalars.py"
 
-_DEFAULT = trading.DEFAULT_EXCHANGE
+_DEFAULT = core.DEFAULT_EXCHANGE
 _TZ_TS = pa.timestamp("us", tz="UTC")
 _EXCHANGE_DOC = "Exchange MIC code, e.g. 'XNYS', 'XNAS', 'XLON'. See tcal.exchanges."
 # Machine-readable constraint (VGI317): enumerate the accepted exchange codes so
 # agents discover valid inputs via vgi_function_arguments() instead of guessing.
-_EXCHANGE_CHOICES = trading.list_exchanges()
+_EXCHANGE_CHOICES = core.list_exchanges()
 
 
 # ---------------------------------------------------------------------------
@@ -48,7 +48,7 @@ _EXCHANGE_CHOICES = trading.list_exchanges()
 
 
 def _is_trading_day_column(date: pa.Date32Array, *, exchange: str) -> pa.BooleanArray:
-    out = [None if d is None else trading.is_trading_day(d, exchange) for d in date.to_pylist()]
+    out = [None if d is None else core.is_trading_day(d, exchange) for d in date.to_pylist()]
     return pa.array(out, type=pa.bool_())
 
 
@@ -144,7 +144,7 @@ class IsTradingDayExchangeFunction(ScalarFunction):
 
 
 def _next_trading_day_column(date: pa.Date32Array, *, exchange: str) -> pa.Date32Array:
-    out = [None if d is None else trading.next_trading_day(d, exchange) for d in date.to_pylist()]
+    out = [None if d is None else core.next_trading_day(d, exchange) for d in date.to_pylist()]
     return pa.array(out, type=pa.date32())
 
 
@@ -235,7 +235,7 @@ class NextTradingDayExchangeFunction(ScalarFunction):
 
 
 def _previous_trading_day_column(date: pa.Date32Array, *, exchange: str) -> pa.Date32Array:
-    out = [None if d is None else trading.previous_trading_day(d, exchange) for d in date.to_pylist()]
+    out = [None if d is None else core.previous_trading_day(d, exchange) for d in date.to_pylist()]
     return pa.array(out, type=pa.date32())
 
 
@@ -330,7 +330,7 @@ class PreviousTradingDayExchangeFunction(ScalarFunction):
 
 def _add_trading_days_column(date: pa.Date32Array, n: pa.Int32Array, *, exchange: str) -> pa.Date32Array:
     out = [
-        None if d is None or k is None else trading.add_trading_days(d, int(k), exchange)
+        None if d is None or k is None else core.add_trading_days(d, int(k), exchange)
         for d, k in zip(date.to_pylist(), n.to_pylist(), strict=True)
     ]
     return pa.array(out, type=pa.date32())
@@ -428,7 +428,7 @@ class AddTradingDaysExchangeFunction(ScalarFunction):
 
 def _trading_days_between_column(start: pa.Date32Array, end: pa.Date32Array, *, exchange: str) -> pa.Int32Array:
     out = [
-        None if s is None or e is None else trading.trading_days_between(s, e, exchange)
+        None if s is None or e is None else core.trading_days_between(s, e, exchange)
         for s, e in zip(start.to_pylist(), end.to_pylist(), strict=True)
     ]
     return pa.array(out, type=pa.int32())
@@ -526,12 +526,12 @@ class TradingDaysBetweenExchangeFunction(ScalarFunction):
 
 
 def _market_open_column(date: pa.Date32Array, *, exchange: str) -> pa.TimestampArray:
-    out = [None if d is None else trading.market_open(d, exchange) for d in date.to_pylist()]
+    out = [None if d is None else core.market_open(d, exchange) for d in date.to_pylist()]
     return pa.array(out, type=_TZ_TS)
 
 
 def _market_close_column(date: pa.Date32Array, *, exchange: str) -> pa.TimestampArray:
-    out = [None if d is None else trading.market_close(d, exchange) for d in date.to_pylist()]
+    out = [None if d is None else core.market_close(d, exchange) for d in date.to_pylist()]
     return pa.array(out, type=_TZ_TS)
 
 
@@ -708,7 +708,7 @@ class MarketCloseExchangeFunction(ScalarFunction):
 
 
 def _is_early_close_column(date: pa.Date32Array, *, exchange: str) -> pa.BooleanArray:
-    out = [None if d is None else trading.is_early_close(d, exchange) for d in date.to_pylist()]
+    out = [None if d is None else core.is_early_close(d, exchange) for d in date.to_pylist()]
     return pa.array(out, type=pa.bool_())
 
 
@@ -796,7 +796,7 @@ class IsEarlyCloseExchangeFunction(ScalarFunction):
         return _is_early_close_column(date, exchange=exchange)
 
 
-TRADING_SCALAR_FUNCTIONS: list[type] = [
+SCALAR_FUNCTIONS: list[type] = [
     IsTradingDayFunction,
     IsTradingDayExchangeFunction,
     NextTradingDayFunction,

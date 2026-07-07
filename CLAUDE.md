@@ -17,17 +17,17 @@ cron-firing worker.
 ```
 trading_calendar_worker.py   repo-root stdio entry point; PEP 723 inline deps; main()
 vgi_trading_calendar/
-  trading.py                 pure trading-calendar math (exchange-calendars); no Arrow/VGI
-  trading_scalars.py         per-row trading scalars (arity overloads, exchange default 'XNYS')
-  trading_tables.py          trading_sessions / trading_schedule / exchanges()
+  core.py                    pure trading-calendar math (exchange-calendars); no Arrow/VGI
+  scalars.py                 per-row trading scalars (arity overloads, exchange default 'XNYS')
+  tables.py                  trading_sessions / trading_schedule / exchanges()
   schema_utils.py            pa.Field comment / column-doc helper
   meta.py                    per-object discovery/description tag helpers (vgi-lint strict)
-tests/                       pytest: test_trading (pure), test_scalars + test_client (Client RPC)
+tests/                       pytest: test_core (pure), test_scalars + test_client (Client RPC)
 test/sql/*.test              haybarn-unittest sqllogictest — authoritative E2E
 Makefile                     test / test-unit / test-sql / lint
 ```
 
-To add a function: implement the math in `trading.py` (pure), wrap it as a scalar
+To add a function: implement the math in `core.py` (pure), wrap it as a scalar
 or table function in the matching module, register it in
 `trading_calendar_worker.py`'s `_FUNCTIONS` (and add it to `_CATEGORY_BY_NAME`).
 
@@ -71,7 +71,7 @@ overload instead. (This same constraint shapes every sibling worker.)
    SKIPPED. Use an explicit `statement ok` / `LOAD vgi;` instead (the SQL files
    here already do). `LOAD vgi` also works under the locally-built vgi unittest.
 3. **DATE ↔ date32, TIMESTAMP ↔ timestamp(us).** Round-trip these correctly;
-   `trading.py` keeps everything in `datetime.date`/`datetime` and the Arrow
+   `core.py` keeps everything in `datetime.date`/`datetime` and the Arrow
    mapping is in the function wrappers.
 4. **TIMESTAMPTZ scalars need an explicit `Returns(arrow_type=...)`.** A
    `pa.TimestampArray` return raises `TimestampArray requires explicit
@@ -81,7 +81,7 @@ overload instead. (This same constraint shapes every sibling worker.)
    worker maps them to DuckDB `TIMESTAMPTZ`. SQL assertions compare against
    `TIMESTAMPTZ '... +00'` literals so they're timezone-independent.
 5. **`exchange-calendars` coverage window is bounded** (~20yr back to ~1yr
-   ahead). `trading.py` is written bounds-safe via `searchsorted` on
+   ahead). `core.py` is written bounds-safe via `searchsorted` on
    `cal.sessions`, so out-of-window dates return `None`/empty rather than
    raising. It also pulls in `pandas` + `numpy`; the calendar objects are
    `lru_cache`d per process (the state VGI's pooled worker amortizes).

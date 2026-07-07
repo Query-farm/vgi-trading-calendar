@@ -4,7 +4,7 @@ No Arrow or VGI dependency lives here -- just :mod:`exchange_calendars` (the
 maintained successor to Quantopian's ``trading_calendars``) over ``datetime``.
 Keeping the math in one importable, side-effect-free module means it can be
 unit-tested directly and reused by the Arrow-facing adapters in
-:mod:`vgi_trading_calendar.trading_scalars` and :mod:`vgi_trading_calendar.trading_tables`.
+:mod:`vgi_trading_calendar.scalars` and :mod:`vgi_trading_calendar.tables`.
 
 An *exchange* is selected by its ISO-10383 MIC code (default ``"XNYS"`` -- the
 New York Stock Exchange). ``tcal.exchanges`` lists every supported code

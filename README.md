@@ -149,7 +149,7 @@ uv run ruff check .      # lint
 uv run mypy vgi_trading_calendar/
 ```
 
-`tests/test_trading.py` covers the pure trading math (including error / edge
+`tests/test_core.py` covers the pure trading math (including error / edge
 cases); `tests/test_scalars.py` and `tests/test_client.py` spawn
 `trading_calendar_worker.py` over the VGI client/RPC stack exactly as DuckDB
 would after `ATTACH`. The `test/sql/*.test` files are DuckDB sqllogictest cases
@@ -162,14 +162,14 @@ run by [`haybarn-unittest`](https://pypi.org/project/haybarn-unittest/)
 trading_calendar_worker.py   entry point; assembles the `tcal` catalog (inline uv script metadata)
 Makefile                     test / test-unit / test-sql targets
 vgi_trading_calendar/
-  trading.py                 pure trading-calendar math over exchange-calendars (no Arrow/VGI)
-  trading_scalars.py         per-row trading scalars: is_trading_day, market_open/close, ...
-  trading_tables.py          trading tables: trading_sessions, trading_schedule, exchanges
+  core.py                    pure trading-calendar math over exchange-calendars (no Arrow/VGI)
+  scalars.py                 per-row trading scalars: is_trading_day, market_open/close, ...
+  tables.py                  trading tables: trading_sessions, trading_schedule, exchanges
   schema_utils.py            Arrow field/comment helpers
   meta.py                    per-object discovery/description metadata helpers
 tests/
   harness.py                 in-process bind→init→process driver
-  test_trading.py            pure-math unit + error/edge tests
+  test_core.py               pure-math unit + error/edge tests
   test_scalars.py            per-row scalar overloads via vgi.client.Client
   test_client.py             end-to-end scalar + table tests via vgi.client.Client
 test/sql/

@@ -33,12 +33,12 @@ from vgi import Worker
 from vgi.catalog import Catalog, Schema, Table
 
 from vgi_trading_calendar.meta import keywords_array
-from vgi_trading_calendar.trading_scalars import TRADING_SCALAR_FUNCTIONS
-from vgi_trading_calendar.trading_tables import TRADING_TABLE_FUNCTIONS, ExchangesFunction
+from vgi_trading_calendar.scalars import SCALAR_FUNCTIONS
+from vgi_trading_calendar.tables import TABLE_FUNCTIONS, ExchangesFunction
 
 _FUNCTIONS: list[type] = [
-    *TRADING_SCALAR_FUNCTIONS,
-    *TRADING_TABLE_FUNCTIONS,
+    *SCALAR_FUNCTIONS,
+    *TABLE_FUNCTIONS,
 ]
 
 # VGI413 — the schema's `vgi.categories` registry (see below) requires every
