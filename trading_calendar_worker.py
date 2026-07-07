@@ -167,7 +167,9 @@ _EXCHANGES_TABLE = Table(
     function=ExchangesFunction,
     comment="Discovery table of every supported stock-exchange trading-calendar MIC code.",
     # Each MIC code uniquely identifies one exchange calendar -> natural primary key.
+    # `code` is always populated (VGI804 wants NOT NULL declared alongside the key).
     primary_key=(("code",),),
+    not_null=("code",),
     column_comments={
         "code": "Exchange MIC code (e.g. 'XNYS' = NYSE, 'XLON' = London).",
     },
@@ -222,6 +224,28 @@ _SCHEMA_CATEGORIES = json.dumps(
             "description": "Market open/close instants, early closes, and per-session schedules.",
         },
         {"name": "discovery", "description": "Reference table of supported exchange MIC codes."},
+    ]
+)
+
+# VGI509 — at least one guaranteed-runnable example at the catalog level. Each is
+# fully catalog-qualified and offline/deterministic so it runs as written.
+_EXECUTABLE_EXAMPLES = json.dumps(
+    [
+        {
+            "name": "is-market-open",
+            "description": "Whether a date is an NYSE trading session (New Year's Day is a holiday).",
+            "sql": "SELECT tcal.main.is_trading_day(DATE '2026-01-01') AS is_session",
+        },
+        {
+            "name": "next-nyse-session",
+            "description": "The first NYSE session strictly after a given date.",
+            "sql": "SELECT tcal.main.next_trading_day(DATE '2026-01-01') AS next_session",
+        },
+        {
+            "name": "list-exchanges",
+            "description": "A few of the supported exchange MIC codes.",
+            "sql": "SELECT code FROM tcal.main.exchanges ORDER BY code LIMIT 5",
+        },
     ]
 )
 
@@ -304,6 +328,7 @@ _TRADING_CALENDAR_CATALOG = Catalog(
         "vgi.license": "MIT",
         "vgi.support_contact": "https://github.com/Query-farm/vgi-trading-calendar/issues",
         "vgi.support_policy_url": "https://github.com/Query-farm/vgi-trading-calendar/blob/main/README.md",
+        "vgi.executable_examples": _EXECUTABLE_EXAMPLES,
         "vgi.agent_test_tasks": _AGENT_TEST_TASKS,
     },
     source_url="https://github.com/Query-farm/vgi-trading-calendar",
