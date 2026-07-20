@@ -19,6 +19,20 @@ from __future__ import annotations
 
 import json
 
+from vgi.metadata import FunctionExample
+
+
+def examples_to_tag(examples: list[FunctionExample]) -> str:
+    """Serialize ``Meta.examples`` into a ``vgi.example_queries`` JSON string.
+
+    The native ``duckdb_functions().examples`` column carries only SQL text, so a
+    per-example ``description`` is lost there (and vgi-lint's VGI515 then flags the
+    example as undescribed). Re-emitting the same examples through the
+    ``vgi.example_queries`` tag preserves each ``description`` alongside its
+    ``sql``, which is the carrier the linter reads for described examples.
+    """
+    return json.dumps([{"description": ex.description, "sql": ex.sql} for ex in examples])
+
 
 def keywords_array(keywords: str) -> str:
     """Serialize a comma-separated keyword string as a JSON array string.

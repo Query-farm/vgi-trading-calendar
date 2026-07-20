@@ -123,6 +123,18 @@ SELECT count(*) FROM tcal.exchanges WHERE code IN ('XNYS', 'XNAS', 'XLON', 'XTKS
 ----
 4
 
+# XNYS (NYSE) is present exactly once (asserts the agent_test_tasks reference).
+query I
+SELECT count(*) FROM tcal.exchanges WHERE code = 'XNYS';
+----
+1
+
+# trading_sessions exposes its session date as the `session` column.
+query I
+SELECT count(*) FROM tcal.trading_sessions(DATE '2026-01-01', DATE '2026-01-31') WHERE session = DATE '2026-01-02';
+----
+1
+
 # Coverage is broad — the 'XNYS' default is just a default.
 query I
 SELECT count(*) > 50 FROM tcal.exchanges;

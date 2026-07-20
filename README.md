@@ -76,7 +76,7 @@ The split follows what the VGI SDK allows for each function shape:
 | `market_open` | scalar | `(date DATE[, exchange])` | `TIMESTAMPTZ` (UTC, NULL if not a session) |
 | `market_close` | scalar | `(date DATE[, exchange])` | `TIMESTAMPTZ` (UTC, NULL if not a session) |
 | `is_early_close` | scalar | `(date DATE[, exchange])` | `BOOLEAN` |
-| `trading_sessions` | table | `(start DATE, end DATE, exchange := 'XNYS')` | `(date DATE)` |
+| `trading_sessions` | table | `(start DATE, end DATE, exchange := 'XNYS')` | `(session DATE)` |
 | `trading_schedule` | table | `(start DATE, end DATE, exchange := 'XNYS')` | `(session DATE, market_open TIMESTAMPTZ, market_close TIMESTAMPTZ, is_early_close BOOLEAN)` |
 | `exchanges` | table | `()` | `(code VARCHAR)` |
 

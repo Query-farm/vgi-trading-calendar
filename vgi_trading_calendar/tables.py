@@ -13,6 +13,7 @@ per-row, single-value trading functions (``is_trading_day``, ``market_open``,
 from __future__ import annotations
 
 import datetime as _dt
+import json
 from dataclasses import dataclass
 from typing import Annotated, ClassVar
 
@@ -58,7 +59,9 @@ class _TradingSessionsArgs:
     exchange: Annotated[str, _EXCHANGE]
 
 
-_TRADING_SESSIONS_SCHEMA = pa.schema([field("date", pa.date32(), "A trading session in the range.", nullable=False)])
+_TRADING_SESSIONS_SCHEMA = pa.schema(
+    [field("session", pa.date32(), "A trading session date in the range.", nullable=False)]
+)
 
 
 @init_single_worker
@@ -92,22 +95,25 @@ class TradingSessionsFunction(TableFunctionGenerator[_TradingSessionsArgs]):
                 "trading calendar, nyse sessions, date range",
                 _SRC,
             ),
-            "vgi.result_columns_md": (
-                "| column | type | description |\n"
-                "| --- | --- | --- |\n"
-                "| `date` | DATE | A trading session in the range. |\n"
+            "vgi.result_columns_schema": json.dumps(
+                [{"name": "session", "type": "DATE", "description": "A trading session date in the range."}]
             ),
         }
         examples = [
             FunctionExample(
-                sql="SELECT * FROM tcal.main.trading_sessions(DATE '2026-01-01', DATE '2026-01-31')",
-                description="NYSE sessions in January 2026",
+                sql=(
+                    "SELECT count(*) AS n_sessions "
+                    "FROM tcal.main.trading_sessions(DATE '2026-01-01', DATE '2026-01-31')"
+                ),
+                description="Count the NYSE trading sessions in January 2026.",
             ),
             FunctionExample(
                 sql=(
-                    "SELECT * FROM tcal.main.trading_sessions(DATE '2026-01-01', DATE '2026-01-31', exchange := 'XLON')"
+                    "SELECT session FROM tcal.main.trading_sessions("
+                    "DATE '2026-01-01', DATE '2026-01-31', exchange := 'XLON') "
+                    "WHERE session >= DATE '2026-01-26'"
                 ),
-                description="London sessions in January 2026",
+                description="The last London Stock Exchange sessions of January 2026 (26th onward).",
             ),
         ]
 
@@ -121,7 +127,7 @@ class TradingSessionsFunction(TableFunctionGenerator[_TradingSessionsArgs]):
         """Emit the function's output rows into the collector."""
         a = params.args
         days = core.trading_sessions_in_range(a.start, a.end, a.exchange)
-        out.emit(pa.RecordBatch.from_pydict({"date": days}, schema=params.output_schema))
+        out.emit(pa.RecordBatch.from_pydict({"session": days}, schema=params.output_schema))
         out.finish()
 
 
@@ -183,19 +189,23 @@ class TradingScheduleFunction(TableFunctionGenerator[_TradingScheduleArgs]):
                 "half day, trading hours table, nyse schedule",
                 _SRC,
             ),
-            "vgi.result_columns_md": (
-                "| column | type | description |\n"
-                "| --- | --- | --- |\n"
-                "| `session` | DATE | Trading session date. |\n"
-                "| `market_open` | TIMESTAMPTZ | UTC market-open instant. |\n"
-                "| `market_close` | TIMESTAMPTZ | UTC market-close instant. |\n"
-                "| `is_early_close` | BOOLEAN | True if the session closes early. |\n"
+            "vgi.result_columns_schema": json.dumps(
+                [
+                    {"name": "session", "type": "DATE", "description": "Trading session date."},
+                    {"name": "market_open", "type": "TIMESTAMPTZ", "description": "UTC market-open instant."},
+                    {"name": "market_close", "type": "TIMESTAMPTZ", "description": "UTC market-close instant."},
+                    {"name": "is_early_close", "type": "BOOLEAN", "description": "True if the session closes early."},
+                ]
             ),
         }
         examples = [
             FunctionExample(
-                sql="SELECT * FROM tcal.main.trading_schedule(DATE '2026-11-25', DATE '2026-11-30')",
-                description="NYSE schedule around Thanksgiving (note the early close)",
+                sql=(
+                    "SELECT session, market_close "
+                    "FROM tcal.main.trading_schedule(DATE '2026-11-25', DATE '2026-11-30') "
+                    "WHERE is_early_close"
+                ),
+                description="Half-days in the NYSE Thanksgiving-week schedule, with their early close time.",
             ),
         ]
 

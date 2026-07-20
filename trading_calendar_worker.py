@@ -1,7 +1,7 @@
 # /// script
 # requires-python = ">=3.13"
 # dependencies = [
-#     "vgi-python[http]>=0.10.0",
+#     "vgi-python[http]>=0.16.0",
 #     "exchange-calendars>=4.5",
 # ]
 # ///
@@ -32,7 +32,7 @@ import json
 from vgi import Worker
 from vgi.catalog import Catalog, Schema, Table
 
-from vgi_trading_calendar.meta import keywords_array
+from vgi_trading_calendar.meta import examples_to_tag, keywords_array
 from vgi_trading_calendar.scalars import SCALAR_FUNCTIONS
 from vgi_trading_calendar.tables import TABLE_FUNCTIONS, ExchangesFunction
 
@@ -65,9 +65,19 @@ _CATEGORY_BY_NAME: dict[str, str] = {
     # from this function-name map.
 }
 
+# VGI515 — the native `duckdb_functions().examples` column carries SQL text only,
+# so each `Meta.examples` FunctionExample's `description` is dropped on the wire and
+# vgi-lint sees an undescribed example. Re-emit every function's examples through the
+# `vgi.example_queries` tag (which preserves the description) and clear the native
+# list so there is no undescribed duplicate. The same loop stamps `vgi.category`.
 for _fn in _FUNCTIONS:
     _meta = _fn.Meta  # type: ignore[attr-defined]  # every registered function class defines Meta
-    _meta.tags = {**dict(_meta.tags), "vgi.category": _CATEGORY_BY_NAME[_meta.name]}
+    _tags = {**dict(_meta.tags), "vgi.category": _CATEGORY_BY_NAME[_meta.name]}
+    _examples = list(getattr(_meta, "examples", ()))
+    if _examples:
+        _tags["vgi.example_queries"] = examples_to_tag(_examples)
+        _meta.examples = []
+    _meta.tags = _tags
 
 _CATALOG_DESCRIPTION_LLM = (
     "Stock-exchange trading-calendar math for SQL (default exchange 'XNYS' = NYSE): test whether a "
@@ -103,15 +113,9 @@ _CATALOG_DESCRIPTION_MD = (
     "decades back to about a year ahead — future exchange holidays are only defined so far); a "
     "date outside that window resolves to `NULL` / no rows rather than raising.\n\n"
     "Per-row questions are answered by scalar functions you can drop straight into a projection "
-    "or predicate; set-returning questions — a range of trading sessions, an expanded schedule — "
-    "are table functions. The exchange is an ordinary argument that defaults to `'XNYS'`. List "
-    "the schema to discover the full surface and each function's arguments; a few starting "
-    "points:\n\n"
-    "```sql\n"
-    "SELECT tcal.main.is_trading_day(DATE '2026-01-01');\n"
-    "SELECT tcal.main.add_trading_days(DATE '2026-01-02', 10);\n"
-    "SELECT * FROM tcal.main.trading_schedule(DATE '2026-11-25', DATE '2026-11-30');\n"
-    "```"
+    "or predicate; set-returning questions — a range of trading sessions, an expanded "
+    "per-session schedule — are table functions. The exchange is an ordinary argument that "
+    "defaults to `'XNYS'`."
 )
 
 _SCHEMA_DESCRIPTION_LLM = (
@@ -135,26 +139,70 @@ _SCHEMA_DESCRIPTION_MD = (
     "instants. `DATE`, `TIMESTAMP`, and `TIMESTAMPTZ` round-trip natively over Arrow.\n\n"
     "**When to use it**\n\n"
     "Reach for this schema for trading-day filtering, settlement (T+N) date math, session "
-    "alignment, and market-hours analytics. List the schema to discover the functions and their "
-    "arguments."
+    "alignment of fills and ticks, and market-hours analytics."
 )
 
-# VGI506 — representative, catalog-qualified example queries for the schema.
-# Every reference is fully qualified (`tcal.main.<fn>`) so each line executes as
-# written against the attached worker.
-_SCHEMA_EXAMPLE_QUERIES = (
-    "SELECT tcal.main.is_trading_day(DATE '2026-01-01');\n"
-    "SELECT tcal.main.is_trading_day(DATE '2026-07-03', 'XLON');\n"
-    "SELECT tcal.main.next_trading_day(DATE '2026-01-01');\n"
-    "SELECT tcal.main.previous_trading_day(DATE '2026-01-02');\n"
-    "SELECT tcal.main.add_trading_days(DATE '2026-01-02', 10);\n"
-    "SELECT tcal.main.trading_days_between(DATE '2026-01-01', DATE '2026-02-01');\n"
-    "SELECT tcal.main.market_open(DATE '2026-01-02');\n"
-    "SELECT tcal.main.market_close(DATE '2026-11-27');\n"
-    "SELECT tcal.main.is_early_close(DATE '2026-11-27');\n"
-    "SELECT * FROM tcal.main.trading_sessions(DATE '2026-01-01', DATE '2026-01-31');\n"
-    "SELECT * FROM tcal.main.trading_schedule(DATE '2026-11-25', DATE '2026-11-30');\n"
-    "SELECT * FROM tcal.main.exchanges ORDER BY code;"
+# VGI506/VGI515 — representative, catalog-qualified, described example queries for
+# the schema. Every reference is fully qualified (`tcal.main.<fn>`) so each entry
+# executes as written against the attached worker, and each carries a human-readable
+# description (a plain SQL string is not a described-example list).
+_SCHEMA_EXAMPLE_QUERIES = json.dumps(
+    [
+        {
+            "description": "Is New Year's Day 2026 an NYSE trading session? (No — it is a holiday.)",
+            "sql": "SELECT tcal.main.is_trading_day(DATE '2026-01-01') AS is_session",
+        },
+        {
+            "description": "Is 3 July 2026 (US Independence Day observed) a London Stock Exchange session?",
+            "sql": "SELECT tcal.main.is_trading_day(DATE '2026-07-03', 'XLON') AS is_session",
+        },
+        {
+            "description": "The first NYSE session strictly after New Year's Day 2026.",
+            "sql": "SELECT tcal.main.next_trading_day(DATE '2026-01-01') AS next_session",
+        },
+        {
+            "description": "The last NYSE session strictly before 2 January 2026.",
+            "sql": "SELECT tcal.main.previous_trading_day(DATE '2026-01-02') AS prev_session",
+        },
+        {
+            "description": "Advance a trade date by 10 NYSE sessions (settlement-style date math).",
+            "sql": "SELECT tcal.main.add_trading_days(DATE '2026-01-02', 10) AS settle_date",
+        },
+        {
+            "description": "Count NYSE sessions in January 2026 via the half-open [start, end) interval.",
+            "sql": "SELECT tcal.main.trading_days_between(DATE '2026-01-01', DATE '2026-02-01') AS n_sessions",
+        },
+        {
+            "description": "NYSE market-open instant (UTC) for 2 January 2026.",
+            "sql": "SELECT tcal.main.market_open(DATE '2026-01-02') AS open_utc",
+        },
+        {
+            "description": "NYSE early close (UTC) the day after US Thanksgiving 2026.",
+            "sql": "SELECT tcal.main.market_close(DATE '2026-11-27') AS close_utc",
+        },
+        {
+            "description": "Flag the day after US Thanksgiving 2026 as an early-close half-day.",
+            "sql": "SELECT tcal.main.is_early_close(DATE '2026-11-27') AS early_close",
+        },
+        {
+            "description": "Count the NYSE trading sessions in January 2026.",
+            "sql": (
+                "SELECT count(*) AS n_sessions FROM tcal.main.trading_sessions(DATE '2026-01-01', DATE '2026-01-31')"
+            ),
+        },
+        {
+            "description": "Half-days in the NYSE Thanksgiving-week schedule, with their early close time.",
+            "sql": (
+                "SELECT session, market_close "
+                "FROM tcal.main.trading_schedule(DATE '2026-11-25', DATE '2026-11-30') "
+                "WHERE is_early_close"
+            ),
+        },
+        {
+            "description": "The first five supported exchange MIC codes, alphabetically.",
+            "sql": "SELECT code FROM tcal.main.exchanges ORDER BY code LIMIT 5",
+        },
+    ]
 )
 
 # VGI311 — the `exchanges` reference dataset always returns the same rows, so we
@@ -303,6 +351,67 @@ _AGENT_TEST_TASKS = json.dumps(
                 "but London is unaffected. Return a single boolean."
             ),
             "reference_sql": "SELECT tcal.main.is_trading_day(DATE '2026-07-03', 'XLON') AS is_session",
+            "ignore_column_names": True,
+        },
+        {
+            "name": "previous-nyse-session-before-jan-2",
+            "prompt": (
+                "Using the tcal worker, what is the last New York Stock Exchange trading session "
+                "strictly before 2 January 2026? Return a single date."
+            ),
+            "reference_sql": "SELECT tcal.main.previous_trading_day(DATE '2026-01-02') AS prev_session",
+            "ignore_column_names": True,
+        },
+        {
+            "name": "nyse-open-instant-jan-2",
+            "prompt": (
+                "Using the tcal worker, at what UTC timestamp does the New York Stock Exchange open "
+                "on 2 January 2026? Return a single timestamp."
+            ),
+            "reference_sql": "SELECT tcal.main.market_open(DATE '2026-01-02') AS market_open",
+            "ignore_column_names": True,
+        },
+        {
+            "name": "is-nyse-early-close-after-thanksgiving",
+            "prompt": (
+                "Using the tcal worker, is 27 November 2026 (the day after US Thanksgiving) an "
+                "early-close half-day session on the New York Stock Exchange? Return a single "
+                "boolean."
+            ),
+            "reference_sql": "SELECT tcal.main.is_early_close(DATE '2026-11-27') AS early_close",
+            "ignore_column_names": True,
+        },
+        {
+            "name": "count-nyse-sessions-via-trading-sessions",
+            "prompt": (
+                "Using the tcal worker, list the New York Stock Exchange trading sessions from 1 "
+                "January 2026 through 31 January 2026 (inclusive) and return how many there are as "
+                "a single integer."
+            ),
+            "reference_sql": (
+                "SELECT count(*) AS n_sessions FROM tcal.main.trading_sessions(DATE '2026-01-01', DATE '2026-01-31')"
+            ),
+            "ignore_column_names": True,
+        },
+        {
+            "name": "thanksgiving-schedule-early-close-flag",
+            "prompt": (
+                "Using the tcal worker, in the New York Stock Exchange schedule for 27 November "
+                "2026, is that session flagged as an early close? Return a single boolean."
+            ),
+            "reference_sql": (
+                "SELECT is_early_close FROM tcal.main.trading_schedule(DATE '2026-11-27', DATE '2026-11-27')"
+            ),
+            "ignore_column_names": True,
+        },
+        {
+            "name": "nyse-in-supported-exchanges",
+            "prompt": (
+                "Using the tcal worker, confirm the New York Stock Exchange (MIC code 'XNYS') is "
+                "one of the supported exchange calendars by returning how many rows of the "
+                "supported-exchanges list have that code (expect 1). Return a single integer."
+            ),
+            "reference_sql": "SELECT count(*) AS n FROM tcal.main.exchanges WHERE code = 'XNYS'",
             "ignore_column_names": True,
         },
     ]

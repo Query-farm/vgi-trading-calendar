@@ -54,7 +54,7 @@ def test_trading_sessions_table_function(client: Client) -> None:
     table = pa.Table.from_batches(results)
     # 20 NYSE sessions in January 2026; New Year's Day is excluded.
     assert table.num_rows == 20
-    assert dt.date(2026, 1, 1) not in table.column("date").to_pylist()
+    assert dt.date(2026, 1, 1) not in table.column("session").to_pylist()
 
 
 def test_trading_schedule_marks_early_close(client: Client) -> None:
