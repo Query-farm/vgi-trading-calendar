@@ -41,6 +41,14 @@ dependencies = [
 http = [
     "vgi-python[http]>=0.16.0",
 ]
+# HTTP-serving extra installed by the published Docker image (`pip install
+# '.[serve]'`) so the container can serve the worker over HTTP (/health + VGI
+# RPC) via `vgi-serve --http` (waitress). Alias of `http` — a distinct name so
+# the Dockerfile matches the fleet's `.[serve]` convention; a plain stdio host
+# install stays lean.
+serve = [
+    "vgi-python[http]>=0.16.0",
+]
 dev = [
     "pytest>=8",
     "ruff>=0.5",
