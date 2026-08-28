@@ -29,7 +29,7 @@ classifiers = [
 ]
 requires-python = ">=3.13"
 dependencies = [
-    "vgi-python>=0.16.0",
+    "vgi-python>=0.30.0",
     "exchange-calendars>=4.5",
     "pyarrow",
 ]
@@ -39,7 +39,7 @@ dependencies = [
 # --http`) in addition to stdio. That path needs vgi-python's `http` extra
 # (waitress). CI's http transport leg installs this via `uv sync --extra http`.
 http = [
-    "vgi-python[http]>=0.16.0",
+    "vgi-python[http]>=0.30.0",
 ]
 # HTTP-serving extra installed by the published Docker image (`pip install
 # '.[serve]'`) so the container can serve the worker over HTTP (/health + VGI
@@ -47,7 +47,7 @@ http = [
 # the Dockerfile matches the fleet's `.[serve]` convention; a plain stdio host
 # install stays lean.
 serve = [
-    "vgi-python[http]>=0.16.0",
+    "vgi-python[http]>=0.30.0",
 ]
 dev = [
     "pytest>=8",
