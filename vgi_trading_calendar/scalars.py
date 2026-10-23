@@ -22,7 +22,7 @@ Set-returning trading functions (``trading_sessions``, ``trading_schedule``,
 
 from __future__ import annotations
 
-from typing import Annotated
+from typing import Annotated, cast
 
 import pyarrow as pa
 from vgi.arguments import ConstParam, Param, Returns
@@ -527,12 +527,12 @@ class TradingDaysBetweenExchangeFunction(ScalarFunction):
 
 def _market_open_column(date: pa.Date32Array, *, exchange: str) -> pa.TimestampArray:
     out = [None if d is None else core.market_open(d, exchange) for d in date.to_pylist()]
-    return pa.array(out, type=_TZ_TS)
+    return cast(pa.TimestampArray, pa.array(out, type=_TZ_TS))
 
 
 def _market_close_column(date: pa.Date32Array, *, exchange: str) -> pa.TimestampArray:
     out = [None if d is None else core.market_close(d, exchange) for d in date.to_pylist()]
-    return pa.array(out, type=_TZ_TS)
+    return cast(pa.TimestampArray, pa.array(out, type=_TZ_TS))
 
 
 class MarketOpenFunction(ScalarFunction):

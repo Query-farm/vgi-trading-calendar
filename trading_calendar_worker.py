@@ -1,7 +1,7 @@
 # /// script
 # requires-python = ">=3.13"
 # dependencies = [
-#     "vgi-python[http]>=0.16.0",
+#     "vgi-python[http]>=0.46.1",
 #     "exchange-calendars>=4.5",
 # ]
 # ///
@@ -298,9 +298,10 @@ _EXECUTABLE_EXAMPLES = json.dumps(
 )
 
 # VGI152 — the fixed agent-suitability task suite used by `vgi-lint simulate`.
-# Each task's `prompt` is all the analyst sees; `reference_sql` is grader-only
-# and must be deterministic. Chosen to exercise the trading-session, navigation,
-# market-hours, and discovery surface. Every expected value is also asserted in
+# Each task's `prompt` is all the analyst sees. Only `name` and `prompt` are
+# published here (VGI416); the deterministic grader-only `reference_sql` and
+# grading options live in vgi-agent-tests.yaml, merged by task name. Chosen to
+# exercise the trading-session, navigation, market-hours, and discovery surface. Every expected value is also asserted in
 # test/sql/trading.test.
 _AGENT_TEST_TASKS = json.dumps(
     [
@@ -310,8 +311,6 @@ _AGENT_TEST_TASKS = json.dumps(
                 "Using the tcal worker, what is the first New York Stock Exchange trading session "
                 "strictly after 1 January 2026? Return a single date."
             ),
-            "reference_sql": "SELECT tcal.main.next_trading_day(DATE '2026-01-01') AS next_session",
-            "ignore_column_names": True,
         },
         {
             "name": "add-ten-nyse-sessions",
@@ -320,8 +319,6 @@ _AGENT_TEST_TASKS = json.dumps(
                 "sessions after 2 January 2026 (skipping weekends and exchange holidays)? Return a "
                 "single date."
             ),
-            "reference_sql": "SELECT tcal.main.add_trading_days(DATE '2026-01-02', 10) AS result",
-            "ignore_column_names": True,
         },
         {
             "name": "count-nyse-sessions-january-2026",
@@ -330,8 +327,6 @@ _AGENT_TEST_TASKS = json.dumps(
                 "in January 2026 — that is, in the half-open range from 1 January 2026 up to (but "
                 "not including) 1 February 2026? Return a single integer."
             ),
-            "reference_sql": ("SELECT tcal.main.trading_days_between(DATE '2026-01-01', DATE '2026-02-01') AS n"),
-            "ignore_column_names": True,
         },
         {
             "name": "nyse-early-close-instant",
@@ -340,8 +335,6 @@ _AGENT_TEST_TASKS = json.dumps(
                 "on 27 November 2026 (the day after US Thanksgiving, an early-close half-day)? "
                 "Return a single timestamp."
             ),
-            "reference_sql": "SELECT tcal.main.market_close(DATE '2026-11-27') AS market_close",
-            "ignore_column_names": True,
         },
         {
             "name": "london-trades-on-us-july-4-observed",
@@ -350,8 +343,6 @@ _AGENT_TEST_TASKS = json.dumps(
                 "Exchange (MIC code 'XLON')? It is a US market holiday (observed Independence Day) "
                 "but London is unaffected. Return a single boolean."
             ),
-            "reference_sql": "SELECT tcal.main.is_trading_day(DATE '2026-07-03', 'XLON') AS is_session",
-            "ignore_column_names": True,
         },
         {
             "name": "previous-nyse-session-before-jan-2",
@@ -359,8 +350,6 @@ _AGENT_TEST_TASKS = json.dumps(
                 "Using the tcal worker, what is the last New York Stock Exchange trading session "
                 "strictly before 2 January 2026? Return a single date."
             ),
-            "reference_sql": "SELECT tcal.main.previous_trading_day(DATE '2026-01-02') AS prev_session",
-            "ignore_column_names": True,
         },
         {
             "name": "nyse-open-instant-jan-2",
@@ -368,8 +357,6 @@ _AGENT_TEST_TASKS = json.dumps(
                 "Using the tcal worker, at what UTC timestamp does the New York Stock Exchange open "
                 "on 2 January 2026? Return a single timestamp."
             ),
-            "reference_sql": "SELECT tcal.main.market_open(DATE '2026-01-02') AS market_open",
-            "ignore_column_names": True,
         },
         {
             "name": "is-nyse-early-close-after-thanksgiving",
@@ -378,8 +365,6 @@ _AGENT_TEST_TASKS = json.dumps(
                 "early-close half-day session on the New York Stock Exchange? Return a single "
                 "boolean."
             ),
-            "reference_sql": "SELECT tcal.main.is_early_close(DATE '2026-11-27') AS early_close",
-            "ignore_column_names": True,
         },
         {
             "name": "count-nyse-sessions-via-trading-sessions",
@@ -388,10 +373,6 @@ _AGENT_TEST_TASKS = json.dumps(
                 "January 2026 through 31 January 2026 (inclusive) and return how many there are as "
                 "a single integer."
             ),
-            "reference_sql": (
-                "SELECT count(*) AS n_sessions FROM tcal.main.trading_sessions(DATE '2026-01-01', DATE '2026-01-31')"
-            ),
-            "ignore_column_names": True,
         },
         {
             "name": "thanksgiving-schedule-early-close-flag",
@@ -399,10 +380,6 @@ _AGENT_TEST_TASKS = json.dumps(
                 "Using the tcal worker, in the New York Stock Exchange schedule for 27 November "
                 "2026, is that session flagged as an early close? Return a single boolean."
             ),
-            "reference_sql": (
-                "SELECT is_early_close FROM tcal.main.trading_schedule(DATE '2026-11-27', DATE '2026-11-27')"
-            ),
-            "ignore_column_names": True,
         },
         {
             "name": "nyse-in-supported-exchanges",
@@ -411,8 +388,6 @@ _AGENT_TEST_TASKS = json.dumps(
                 "one of the supported exchange calendars by returning how many rows of the "
                 "supported-exchanges list have that code (expect 1). Return a single integer."
             ),
-            "reference_sql": "SELECT count(*) AS n FROM tcal.main.exchanges WHERE code = 'XNYS'",
-            "ignore_column_names": True,
         },
     ]
 )
@@ -443,7 +418,7 @@ _TRADING_CALENDAR_CATALOG = Catalog(
     source_url="https://github.com/Query-farm/vgi-trading-calendar",
     schemas=[
         Schema(
-            name="main",
+            path=["main"],
             comment="Stock-exchange trading-calendar math for SQL",
             tags={
                 "vgi.title": "Trading calendars — main",

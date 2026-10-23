@@ -1,0 +1,37 @@
+# Private graders for `vgi-lint simulate` (VGI416). The worker publishes only
+# task names and prompts in vgi.agent_test_tasks; these canonical solutions and
+# grading options stay in the repo and are merged by task name.
+tasks:
+  - name: next-nyse-session-after-new-year
+    reference_sql: "SELECT tcal.main.next_trading_day(DATE '2026-01-01') AS next_session"
+    ignore_column_names: true
+  - name: add-ten-nyse-sessions
+    reference_sql: "SELECT tcal.main.add_trading_days(DATE '2026-01-02', 10) AS result"
+    ignore_column_names: true
+  - name: count-nyse-sessions-january-2026
+    reference_sql: "SELECT tcal.main.trading_days_between(DATE '2026-01-01', DATE '2026-02-01') AS n"
+    ignore_column_names: true
+  - name: nyse-early-close-instant
+    reference_sql: "SELECT tcal.main.market_close(DATE '2026-11-27') AS market_close"
+    ignore_column_names: true
+  - name: london-trades-on-us-july-4-observed
+    reference_sql: "SELECT tcal.main.is_trading_day(DATE '2026-07-03', 'XLON') AS is_session"
+    ignore_column_names: true
+  - name: previous-nyse-session-before-jan-2
+    reference_sql: "SELECT tcal.main.previous_trading_day(DATE '2026-01-02') AS prev_session"
+    ignore_column_names: true
+  - name: nyse-open-instant-jan-2
+    reference_sql: "SELECT tcal.main.market_open(DATE '2026-01-02') AS market_open"
+    ignore_column_names: true
+  - name: is-nyse-early-close-after-thanksgiving
+    reference_sql: "SELECT tcal.main.is_early_close(DATE '2026-11-27') AS early_close"
+    ignore_column_names: true
+  - name: count-nyse-sessions-via-trading-sessions
+    reference_sql: "SELECT count(*) AS n_sessions FROM tcal.main.trading_sessions(DATE '2026-01-01', DATE '2026-01-31')"
+    ignore_column_names: true
+  - name: thanksgiving-schedule-early-close-flag
+    reference_sql: "SELECT is_early_close FROM tcal.main.trading_schedule(DATE '2026-11-27', DATE '2026-11-27')"
+    ignore_column_names: true
+  - name: nyse-in-supported-exchanges
+    reference_sql: "SELECT count(*) AS n FROM tcal.main.exchanges WHERE code = 'XNYS'"
+    ignore_column_names: true

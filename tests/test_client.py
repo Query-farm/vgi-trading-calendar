@@ -31,6 +31,7 @@ def test_next_trading_day_scalar(client: Client) -> None:
     results = list(
         client.scalar_function(
             function_name="next_trading_day",
+            schema_path=["main"],
             input=iter([batch]),
             arguments=Arguments(positional=()),
         )
@@ -42,6 +43,7 @@ def test_trading_sessions_table_function(client: Client) -> None:
     results = list(
         client.table_function(
             function_name="trading_sessions",
+            schema_path=["main"],
             arguments=Arguments(
                 positional=(
                     pa.scalar(dt.date(2026, 1, 1), type=pa.date32()),
@@ -61,6 +63,7 @@ def test_trading_schedule_marks_early_close(client: Client) -> None:
     results = list(
         client.table_function(
             function_name="trading_schedule",
+            schema_path=["main"],
             arguments=Arguments(
                 positional=(
                     pa.scalar(dt.date(2026, 11, 27), type=pa.date32()),
