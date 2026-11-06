@@ -8,7 +8,7 @@ statement ok
 LOAD vgi;
 
 statement ok
-ATTACH 'tcal' AS tcal (TYPE vgi, LOCATION '${VGI_TRADING_CALENDAR_WORKER}');
+ATTACH 'tcal' AS tcal (TYPE vgi, LOCATION '{VGI_TRADING_CALENDAR_WORKER}');
 
 # ---------------------------------------------------------------------------
 # Trading-day predicates and navigation (default exchange XNYS = NYSE)

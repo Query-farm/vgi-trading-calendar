@@ -98,7 +98,7 @@ uv run ruff check . && uv run mypy vgi_trading_calendar/
 `make test-sql` sets `VGI_TRADING_CALENDAR_WORKER="uv run --python 3.13
 trading_calendar_worker.py"`, puts `~/.local/bin` on PATH, and runs
 `haybarn-unittest --test-dir . "test/sql/*"`. Install the runner once with
-`uv tool install haybarn-unittest`. **The SQL suite is authoritative** — unit
+`uv tool install --prerelease allow 'haybarn-unittest>=2.0.0rc11,<2.1'`. **The SQL suite is authoritative** — unit
 tests call functions directly and can pass while the RPC path is broken. CI
 (`.github/workflows/ci.yml`) runs unit + lint + vgi-lint + a gated `integration`
 matrix (subprocess/http/unix transports) that runs `ci/run-integration.sh`.

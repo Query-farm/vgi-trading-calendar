@@ -1,7 +1,7 @@
 # /// script
 # requires-python = ">=3.13"
 # dependencies = [
-#     "vgi-python[http]>=0.46.1",
+#     "vgi-python[http]>=0.49.0",
 #     "exchange-calendars>=4.5",
 # ]
 # ///
@@ -30,7 +30,7 @@ from __future__ import annotations
 import json
 
 from vgi import Worker
-from vgi.catalog import Catalog, Schema, Table
+from vgi.catalog import Catalog, ConstraintInfo, Schema, Table, constraint_record
 
 from vgi_trading_calendar.meta import examples_to_tag, keywords_array
 from vgi_trading_calendar.scalars import SCALAR_FUNCTIONS
@@ -205,6 +205,27 @@ _SCHEMA_EXAMPLE_QUERIES = json.dumps(
     ]
 )
 
+
+def _trusted(table: str, constraint_id: str, kind: str, columns: list[list[str]]) -> ConstraintInfo:
+    """Build an ENFORCED + ALL_ROWS constraint record on a ``main``-schema table.
+
+    vgi.v3 carries table constraints as canonical records; DuckDB only reads
+    records that hold for every row (``ENFORCED`` + ``ALL_ROWS``).
+
+    Args:
+        table: Table name the constraint belongs to.
+        constraint_id: Identifier unique within the table.
+        kind: Constraint kind (``"PRIMARY_KEY"``, ``"NOT_NULL"``, ...).
+        columns: Column paths the constraint covers, e.g. ``[["code"]]``.
+
+    Returns:
+        The canonical constraint record.
+    """
+    return constraint_record(
+        ["main"], table, constraint_id, kind, columns, enforcement="ENFORCED", validation="ALL_ROWS"
+    )
+
+
 # VGI311 — the `exchanges` reference dataset always returns the same rows, so we
 # expose it as a regular scan-backed TABLE: the `Table(function=…)` form serves
 # the rows of the backing generator directly, letting consumers write
@@ -215,9 +236,12 @@ _EXCHANGES_TABLE = Table(
     function=ExchangesFunction,
     comment="Discovery table of every supported stock-exchange trading-calendar MIC code.",
     # Each MIC code uniquely identifies one exchange calendar -> natural primary key.
-    # `code` is always populated (VGI804 wants NOT NULL declared alongside the key).
-    primary_key=(("code",),),
-    not_null=("code",),
+    # `code` is always populated (VGI804 wants NOT NULL declared alongside the key,
+    # so the PK column also gets its own NOT_NULL record).
+    constraints=(
+        _trusted("exchanges", "pk", "PRIMARY_KEY", [["code"]]),
+        _trusted("exchanges", "code_not_null", "NOT_NULL", [["code"]]),
+    ),
     column_comments={
         "code": "Exchange MIC code (e.g. 'XNYS' = NYSE, 'XLON' = London).",
     },
