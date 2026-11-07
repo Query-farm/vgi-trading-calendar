@@ -159,9 +159,10 @@ run by [`haybarn-unittest`](https://pypi.org/project/haybarn-unittest/)
 ## Layout
 
 ```
-trading_calendar_worker.py   entry point; assembles the `tcal` catalog (inline uv script metadata)
+trading_calendar_worker.py   repo-root shim for `uv run` (inline uv script metadata)
 Makefile                     test / test-unit / test-sql targets
 vgi_trading_calendar/
+  worker.py                  assembles the `tcal` catalog; `vgi-trading-calendar-worker` entry point
   core.py                    pure trading-calendar math over exchange-calendars (no Arrow/VGI)
   scalars.py                 per-row trading scalars: is_trading_day, market_open/close, ...
   tables.py                  trading tables: trading_sessions, trading_schedule, exchanges

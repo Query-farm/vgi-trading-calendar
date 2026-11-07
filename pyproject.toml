@@ -34,6 +34,9 @@ dependencies = [
     "pyarrow",
 ]
 
+[project.scripts]
+vgi-trading-calendar-worker = "vgi_trading_calendar.worker:main"
+
 [project.optional-dependencies]
 # HTTP transport: the worker can serve over HTTP (`trading_calendar_worker.py
 # --http`) in addition to stdio. That path needs vgi-python's `http` extra
@@ -76,6 +79,7 @@ select = ["E", "F", "I", "UP", "B", "SIM", "D"]
 "tests/**" = ["D"]
 # The PEP 723 inline-script header wraps dependency pins that should stay one-per-line.
 "trading_calendar_worker.py" = ["E501"]
+"vgi_trading_calendar/worker.py" = ["E501"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"

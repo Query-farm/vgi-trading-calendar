@@ -7,7 +7,7 @@ Contributor/agent notes. User-facing docs live in `README.md`; this is the
 
 A [VGI](https://query.farm) worker exposing **stock-exchange trading-calendar**
 math to DuckDB/SQL, backed by `exchange-calendars` (Apache-2.0).
-`trading_calendar_worker.py` assembles every function into one `tcal` catalog
+`vgi_trading_calendar/worker.py` assembles every function into one `tcal` catalog
 (single `main` schema) over stdio. Split out of `vgi-calendar`, which keeps the
 holiday / business-day / RFC-5545 recurrence side; `vgi-crontimes` is the sibling
 cron-firing worker.
@@ -15,8 +15,9 @@ cron-firing worker.
 ## Layout
 
 ```
-trading_calendar_worker.py   repo-root stdio entry point; PEP 723 inline deps; main()
+trading_calendar_worker.py   repo-root shim (PEP 723 inline deps) -> vgi_trading_calendar.worker:main
 vgi_trading_calendar/
+  worker.py                  assembles the `tcal` catalog; main() = `vgi-trading-calendar-worker` script
   core.py                    pure trading-calendar math (exchange-calendars); no Arrow/VGI
   scalars.py                 per-row trading scalars (arity overloads, exchange default 'XNYS')
   tables.py                  trading_sessions / trading_schedule / exchanges()
@@ -29,7 +30,7 @@ Makefile                     test / test-unit / test-sql / lint
 
 To add a function: implement the math in `core.py` (pure), wrap it as a scalar
 or table function in the matching module, register it in
-`trading_calendar_worker.py`'s `_FUNCTIONS` (and add it to `_CATEGORY_BY_NAME`).
+`vgi_trading_calendar/worker.py`'s `_FUNCTIONS` (and add it to `_CATEGORY_BY_NAME`).
 
 ## Coverage is broad — "US-centric" is just the default
 

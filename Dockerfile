@@ -5,9 +5,7 @@
 #   docker run -i ... IMG stdio   -> stdio worker DuckDB spawns on-host
 # See docker-entrypoint.sh. Keyless + stateless: all trading-calendar math is pure
 # and offline (exchange-calendars), so there is no persistent state volume.
-# The worker's Worker subclass lives in the repo-root script
-# `trading_calendar_worker.py` (not the wheel), so both transports reference it by
-# path; the `vgi_trading_calendar` package + vgi-python[http] come from the wheel.
+# The worker (vgi_trading_calendar.worker) + vgi-python[http] come from the wheel.
 # syntax=docker/dockerfile:1
 FROM python:3.13-slim
 
@@ -36,15 +34,11 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Install the worker package + HTTP-serving extra from the source tree (version
-# read from pyproject.toml by hatchling). Only the `vgi_trading_calendar` package
-# ships in the wheel; the repo-root entry script is copied in separately below.
+# read from pyproject.toml by hatchling). The worker ships in the wheel as
+# `vgi_trading_calendar.worker` + the `vgi-trading-calendar-worker` script.
 COPY pyproject.toml README.md LICENSE ./
 COPY vgi_trading_calendar ./vgi_trading_calendar
 RUN pip install '.[serve]'
-
-# The repo-root Worker entry script (deliberately NOT in the wheel) — both
-# transports reference it by path (/app/trading_calendar_worker.py).
-COPY trading_calendar_worker.py ./
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
