@@ -242,7 +242,7 @@ _EXCHANGES_TABLE = Table(
         "code": "Exchange MIC code (e.g. 'XNYS' = NYSE, 'XLON' = London).",
     },
     tags={
-        "vgi.title": "Supported Exchanges (table)",
+        "vgi.title": "Supported Exchanges",
         "vgi.category": "discovery",
         "vgi.doc_llm": (
             "A ready-to-scan **discovery table** of every supported stock-exchange trading "
@@ -418,7 +418,8 @@ _TRADING_CALENDAR_CATALOG = Catalog(
     default_schema="main",
     comment="Stock-exchange trading-calendar math for SQL: sessions, market hours, and schedules",
     tags={
-        "vgi.title": "Trading-Day & Market-Hours Math",
+        "vgi.title": "Trading Calendar",
+        "vgi.subtitle": "Find trading days, sessions and market hours for stock exchanges.",
         "vgi.keywords": keywords_array(
             "trading day, trading calendar, exchange calendar, trading session, market open, "
             "market close, market hours, early close, half day, settlement, t+n, "
@@ -441,7 +442,7 @@ _TRADING_CALENDAR_CATALOG = Catalog(
             path=["main"],
             comment="Stock-exchange trading-calendar math for SQL",
             tags={
-                "vgi.title": "Trading calendars — main",
+                "vgi.title": "Trading Calendar Functions",
                 "vgi.keywords": keywords_array(
                     "trading day, trading session, next trading day, add trading days, "
                     "market open, market close, early close, trading schedule, exchange calendar, "

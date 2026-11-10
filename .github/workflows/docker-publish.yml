@@ -59,7 +59,7 @@ jobs:
 
         echo "::group::download haybarn-unittest"
         # haybarn 2.0 is RC-only, so `gh release view` (no tag) still returns the 1.5
-        # line; the worker speaks vgi.v3 (3.1), which only the 2.0 extension accepts.
+        # line; the worker speaks vgi.v3 (3.2), which only the 2.0 extension accepts.
         REL=$(gh release list --repo Query-farm-haybarn/haybarn --limit 30 --json tagName \
           --jq '[.[].tagName | select(startswith("haybarn-v2.0"))][0]')
         [ -n "$REL" ] && [ "$REL" != "null" ] || { echo "::error::no haybarn-v2.0.* release found"; exit 1; }
