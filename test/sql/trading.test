@@ -156,5 +156,50 @@ SELECT count(*) > 50 FROM tcal.exchanges;
 ----
 true
 
+# ---------------------------------------------------------------------------
+# Composed examples (vgi_trading_calendar/composed.py) — several tcal objects
+# in one query. Keep these in sync with the published example SQL.
+# ---------------------------------------------------------------------------
+
+# trading_sessions + is_trading_day: NYSE open, London closed (UK bank holidays).
+query I
+SELECT s.session FROM tcal.main.trading_sessions(DATE '2026-01-01', DATE '2026-12-31') AS s WHERE NOT tcal.main.is_trading_day(s.session, 'XLON') ORDER BY s.session
+----
+2026-04-06
+2026-05-04
+2026-08-31
+2026-12-28
+
+# trading_sessions + add_trading_days: T+1 settlement skips Thanksgiving.
+query II
+SELECT s.session AS trade_date, tcal.main.add_trading_days(s.session, 1) AS settles_t1 FROM tcal.main.trading_sessions(DATE '2026-11-23', DATE '2026-11-30') AS s ORDER BY s.session
+----
+2026-11-23	2026-11-24
+2026-11-24	2026-11-25
+2026-11-25	2026-11-27
+2026-11-27	2026-11-30
+2026-11-30	2026-12-01
+
+# trading_schedule + next_trading_day + market_open: half-days (18:00 UTC close) and
+# the next open (14:30 UTC); epoch() keeps the check timezone-independent.
+query IIII
+SELECT sc.session, epoch(sc.market_close) = epoch(sc.session + INTERVAL 18 HOUR), tcal.main.next_trading_day(sc.session) AS next_session, epoch(tcal.main.market_open(tcal.main.next_trading_day(sc.session))) = epoch(tcal.main.next_trading_day(sc.session) + INTERVAL '14 hours 30 minutes') FROM tcal.main.trading_schedule(DATE '2026-01-01', DATE '2026-12-31') AS sc WHERE sc.is_early_close ORDER BY sc.session
+----
+2026-11-27	true	2026-11-30	true
+2026-12-24	true	2026-12-28	true
+
+# trading_schedule XNYS joined to XLON: overlap widens during the US/UK DST gap.
+query III
+SELECT date_diff('minute', greatest(ny.market_open, ln.market_open), least(ny.market_close, ln.market_close)) AS overlap_minutes, count(*) AS n_sessions, min(ny.session) AS first_session FROM tcal.main.trading_schedule(DATE '2026-03-01', DATE '2026-04-30') AS ny JOIN tcal.main.trading_schedule(DATE '2026-03-01', DATE '2026-04-30', exchange := 'XLON') AS ln USING (session) GROUP BY overlap_minutes ORDER BY first_session
+----
+120	27	2026-03-02
+180	15	2026-03-09
+
+# Grader for agent task nyse-2026-t1-settlement-gaps (vgi-agent-tests.yaml).
+query I
+SELECT count(*) AS n FROM tcal.main.trading_sessions(DATE '2026-01-01', DATE '2026-12-31') AS s WHERE tcal.main.add_trading_days(s.session, 1) > s.session + 1
+----
+54
+
 statement ok
 DETACH tcal;

@@ -30,7 +30,7 @@ from vgi.table_function import (
 )
 from vgi_rpc.rpc import OutputCollector
 
-from . import core
+from . import composed, core
 from .meta import object_tags
 from .schema_utils import field
 
@@ -115,6 +115,8 @@ class TradingSessionsFunction(TableFunctionGenerator[_TradingSessionsArgs]):
                 ),
                 description="The last London Stock Exchange sessions of January 2026 (26th onward).",
             ),
+            composed.NYSE_OPEN_LONDON_CLOSED,
+            composed.T1_SETTLEMENT_THANKSGIVING_WEEK,
         ]
 
     @classmethod
@@ -207,6 +209,8 @@ class TradingScheduleFunction(TableFunctionGenerator[_TradingScheduleArgs]):
                 ),
                 description="Half-days in the NYSE Thanksgiving-week schedule, with their early close time.",
             ),
+            composed.EARLY_CLOSE_NEXT_OPEN,
+            composed.TRANSATLANTIC_OVERLAP_DST,
         ]
 
     @classmethod
@@ -309,7 +313,7 @@ class ExchangesFunction(TableFunctionGenerator[_NoArgs]):
 
 
 # NB: ExchangesFunction is intentionally NOT registered as a standalone table
-# function — it backs the scan `Table(name="exchanges", …)` in calendar_worker.py,
+# function — it backs the scan `Table(name="exchanges", …)` in worker.py,
 # so the exchange MIC codes are exposed once, as a plain table (no parens).
 TABLE_FUNCTIONS: list[type] = [
     TradingSessionsFunction,

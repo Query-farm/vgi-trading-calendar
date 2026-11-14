@@ -35,3 +35,6 @@ tasks:
   - name: nyse-in-supported-exchanges
     reference_sql: "SELECT count(*) AS n FROM tcal.main.exchanges WHERE code = 'XNYS'"
     ignore_column_names: true
+  - name: nyse-2026-t1-settlement-gaps
+    reference_sql: "SELECT count(*) AS n FROM tcal.main.trading_sessions(DATE '2026-01-01', DATE '2026-12-31') AS s WHERE tcal.main.add_trading_days(s.session, 1) > s.session + 1"
+    ignore_column_names: true

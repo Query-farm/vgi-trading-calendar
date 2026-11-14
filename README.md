@@ -128,15 +128,21 @@ and more (`SELECT * FROM tcal.exchanges`). A **session** is a trading day;
 ```sql
 -- align fills to the next session and tag end-of-day vs intraday
 SELECT id, trade_ts,
-       next_trading_day(trade_ts::DATE)                       AS settles_on,
-       trade_ts >= market_close(trade_ts::DATE, 'XNYS')       AS after_hours
+       tcal.next_trading_day(trade_ts::DATE)                  AS settles_on,
+       trade_ts >= tcal.market_close(trade_ts::DATE, 'XNYS')  AS after_hours
 FROM fills;
 
 -- the trading schedule around a holiday week (note the early close)
 SELECT * FROM tcal.trading_schedule(DATE '2026-11-25', DATE '2026-11-30');
 
 -- count NYSE sessions in a quarter (half-open [start, end))
-SELECT trading_days_between(DATE '2026-01-01', DATE '2026-04-01');
+SELECT tcal.trading_days_between(DATE '2026-01-01', DATE '2026-04-01');
+
+-- combine them: NYSE sessions in 2026 when London is closed (UK bank holidays)
+SELECT s.session
+FROM tcal.trading_sessions(DATE '2026-01-01', DATE '2026-12-31') AS s
+WHERE NOT tcal.is_trading_day(s.session, 'XLON')
+ORDER BY s.session;                       -- 2026-04-06, 05-04, 08-31, 12-28
 ```
 
 `trading_days_between(start, end)` counts the half-open range `[start, end)`

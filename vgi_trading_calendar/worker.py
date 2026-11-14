@@ -28,6 +28,7 @@ import json
 from vgi import Worker
 from vgi.catalog import Catalog, ConstraintInfo, Schema, Table, constraint_record
 
+from vgi_trading_calendar.composed import COMPOSED_EXAMPLES, NYSE_OPEN_LONDON_CLOSED
 from vgi_trading_calendar.meta import examples_to_tag, keywords_array
 from vgi_trading_calendar.scalars import SCALAR_FUNCTIONS
 from vgi_trading_calendar.tables import TABLE_FUNCTIONS, ExchangesFunction
@@ -198,6 +199,8 @@ _SCHEMA_EXAMPLE_QUERIES = json.dumps(
             "description": "The first five supported exchange MIC codes, alphabetically.",
             "sql": "SELECT code FROM tcal.main.exchanges ORDER BY code LIMIT 5",
         },
+        # Composed examples (several tcal objects in one query); defined once in composed.py.
+        *({"description": ex.description, "sql": ex.sql} for ex in COMPOSED_EXAMPLES),
     ]
 )
 
@@ -314,6 +317,11 @@ _EXECUTABLE_EXAMPLES = json.dumps(
             "description": "A few of the supported exchange MIC codes.",
             "sql": "SELECT code FROM tcal.main.exchanges ORDER BY code LIMIT 5",
         },
+        {
+            "name": "nyse-open-london-closed",
+            "description": NYSE_OPEN_LONDON_CLOSED.description,
+            "sql": NYSE_OPEN_LONDON_CLOSED.sql,
+        },
     ]
 )
 
@@ -407,6 +415,16 @@ _AGENT_TEST_TASKS = json.dumps(
                 "Using the tcal worker, confirm the New York Stock Exchange (MIC code 'XNYS') is "
                 "one of the supported exchange calendars by returning how many rows of the "
                 "supported-exchanges list have that code (expect 1). Return a single integer."
+            ),
+        },
+        {
+            "name": "nyse-2026-t1-settlement-gaps",
+            "prompt": (
+                "Using the tcal worker, consider a trade executed on every New York Stock Exchange "
+                "trading session in calendar year 2026 (1 January through 31 December inclusive), "
+                "each settling T+1 (one NYSE trading session later). For how many of those trades "
+                "is the settlement date more than one calendar day after the trade date (because a "
+                "weekend or exchange holiday intervenes)? Return a single integer."
             ),
         },
     ]

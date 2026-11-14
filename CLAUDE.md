@@ -23,6 +23,7 @@ vgi_trading_calendar/
   tables.py                  trading_sessions / trading_schedule / exchanges()
   schema_utils.py            pa.Field comment / column-doc helper
   meta.py                    per-object discovery/description tag helpers (vgi-lint strict)
+  composed.py                composed example queries (several tcal objects in one query), defined once
 tests/                       pytest: test_core (pure), test_scalars + test_client (Client RPC)
 test/sql/*.test              haybarn-unittest sqllogictest — authoritative E2E
 Makefile                     test / test-unit / test-sql / lint
