@@ -1,0 +1,728 @@
+{
+  "query": "SELECT * FROM duckdb_functions() WHERE database_name='tcal' ORDER BY schema_name,function_name",
+  "columns": [
+    "database_name",
+    "database_oid",
+    "schema_name",
+    "function_name",
+    "alias_of",
+    "function_type",
+    "description",
+    "comment",
+    "tags",
+    "return_type",
+    "parameters",
+    "parameter_types",
+    "varargs",
+    "macro_definition",
+    "has_side_effects",
+    "internal",
+    "extension_name",
+    "function_oid",
+    "examples",
+    "stability",
+    "categories"
+  ],
+  "rows": [
+    [
+      "tcal",
+      "22592",
+      "main",
+      "add_trading_days",
+      null,
+      "scalar",
+      "Advance a date by N trading sessions, skipping non-sessions (exchange 'XNYS')",
+      null,
+      {
+        "vgi.category": "sessions",
+        "vgi.doc_llm": "Advance a date by **N trading sessions**, skipping the exchange's non-session days. The `exchange` argument is optional and defaults to `'XNYS'` (NYSE); pass a MIC code (e.g. `'XLON'`) for another market. `N` may be negative to step backwards; the result is always a trading session. Returns `DATE` per row (`NULL` inputs -> `NULL`); `NULL` if outside the calendar's coverage window. List valid codes with `tcal.exchanges`.",
+        "vgi.doc_md": "## add_trading_days(date, n[, exchange])\n\nAdvance `date` by **`n` trading sessions**; `exchange` defaults to `'XNYS'` (e.g. `'XLON'`).\n\nSkips that exchange's non-session days; `n` can be negative. Per-row `DATE`. See `tcal.exchanges`.",
+        "vgi.example_queries": "[{\"description\": \"Five London sessions after 2026-01-02\", \"sql\": \"SELECT tcal.main.add_trading_days(DATE '2026-01-02', 5, 'XLON')\"}]",
+        "vgi.keywords": "[\"add trading days\", \"exchange session offset\", \"settlement\", \"london sessions\", \"xlon\", \"advance sessions\", \"mic code\"]",
+        "vgi.title": "Add Trading Days On Exchange"
+      },
+      "DATE",
+      [
+        "date",
+        "n"
+      ],
+      [
+        "DATE",
+        "INTEGER"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22726,
+      [],
+      "CONSISTENT",
+      [
+        "calendar",
+        "trading"
+      ]
+    ],
+    [
+      "tcal",
+      "22592",
+      "main",
+      "add_trading_days",
+      null,
+      "scalar",
+      "Advance a date by N trading sessions on an exchange",
+      null,
+      {
+        "vgi.category": "sessions",
+        "vgi.doc_llm": "Advance a date by **N trading sessions**, skipping the exchange's non-session days. The `exchange` argument is optional and defaults to `'XNYS'` (NYSE); pass a MIC code (e.g. `'XLON'`) for another market. `N` may be negative to step backwards; the result is always a trading session. Returns `DATE` per row (`NULL` inputs -> `NULL`); `NULL` if outside the calendar's coverage window. List valid codes with `tcal.exchanges`.",
+        "vgi.doc_md": "## add_trading_days(date, n[, exchange])\n\nAdvance `date` by **`n` trading sessions**; `exchange` defaults to `'XNYS'` (e.g. `'XLON'`).\n\nSkips that exchange's non-session days; `n` can be negative. Per-row `DATE`. See `tcal.exchanges`.",
+        "vgi.example_queries": "[{\"description\": \"Five London sessions after 2026-01-02\", \"sql\": \"SELECT tcal.main.add_trading_days(DATE '2026-01-02', 5, 'XLON')\"}]",
+        "vgi.keywords": "[\"add trading days\", \"exchange session offset\", \"settlement\", \"london sessions\", \"xlon\", \"advance sessions\", \"mic code\"]",
+        "vgi.title": "Add Trading Days On Exchange"
+      },
+      "DATE",
+      [
+        "date",
+        "n",
+        "exchange"
+      ],
+      [
+        "DATE",
+        "INTEGER",
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22726,
+      [],
+      "CONSISTENT",
+      [
+        "calendar",
+        "trading"
+      ]
+    ],
+    [
+      "tcal",
+      "22592",
+      "main",
+      "is_early_close",
+      null,
+      "scalar",
+      "True if a date is a session that closes early (exchange 'XNYS')",
+      null,
+      {
+        "vgi.category": "market-hours",
+        "vgi.doc_llm": "Test whether a date is an **early-close (half-day) trading session**. The `exchange` argument is optional and defaults to `'XNYS'` (NYSE); pass a MIC code (e.g. `'XLON'`) for another market -- e.g. Christmas Eve is an early close on the London Stock Exchange. Returns `BOOLEAN` per row: `true` for shortened sessions, `false` for normal sessions, `NULL` for non-sessions or out-of-window dates. List valid codes with `tcal.exchanges`.",
+        "vgi.doc_md": "## is_early_close(date[, exchange])\n\nTrue if `date` is an **early-close session**; `exchange` defaults to `'XNYS'` (e.g. `'XLON'`).\n\n`false` for normal sessions, `NULL` for non-sessions. Per-row `BOOLEAN`. See `tcal.exchanges` and `market_close`.",
+        "vgi.example_queries": "[{\"description\": \"Christmas Eve is an early close on the LSE\", \"sql\": \"SELECT tcal.main.is_early_close(DATE '2026-12-24', 'XLON')\"}]",
+        "vgi.keywords": "[\"is early close\", \"half day\", \"exchange early close\", \"shortened session\", \"london half day\", \"xlon\", \"christmas eve\", \"mic code\"]",
+        "vgi.title": "Is Early-Close Session On Exchange"
+      },
+      "BOOLEAN",
+      [
+        "date"
+      ],
+      [
+        "DATE"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22727,
+      [],
+      "CONSISTENT",
+      [
+        "calendar",
+        "trading"
+      ]
+    ],
+    [
+      "tcal",
+      "22592",
+      "main",
+      "is_early_close",
+      null,
+      "scalar",
+      "True if a date is a session that closes early on an exchange",
+      null,
+      {
+        "vgi.category": "market-hours",
+        "vgi.doc_llm": "Test whether a date is an **early-close (half-day) trading session**. The `exchange` argument is optional and defaults to `'XNYS'` (NYSE); pass a MIC code (e.g. `'XLON'`) for another market -- e.g. Christmas Eve is an early close on the London Stock Exchange. Returns `BOOLEAN` per row: `true` for shortened sessions, `false` for normal sessions, `NULL` for non-sessions or out-of-window dates. List valid codes with `tcal.exchanges`.",
+        "vgi.doc_md": "## is_early_close(date[, exchange])\n\nTrue if `date` is an **early-close session**; `exchange` defaults to `'XNYS'` (e.g. `'XLON'`).\n\n`false` for normal sessions, `NULL` for non-sessions. Per-row `BOOLEAN`. See `tcal.exchanges` and `market_close`.",
+        "vgi.example_queries": "[{\"description\": \"Christmas Eve is an early close on the LSE\", \"sql\": \"SELECT tcal.main.is_early_close(DATE '2026-12-24', 'XLON')\"}]",
+        "vgi.keywords": "[\"is early close\", \"half day\", \"exchange early close\", \"shortened session\", \"london half day\", \"xlon\", \"christmas eve\", \"mic code\"]",
+        "vgi.title": "Is Early-Close Session On Exchange"
+      },
+      "BOOLEAN",
+      [
+        "date",
+        "exchange"
+      ],
+      [
+        "DATE",
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22727,
+      [],
+      "CONSISTENT",
+      [
+        "calendar",
+        "trading"
+      ]
+    ],
+    [
+      "tcal",
+      "22592",
+      "main",
+      "is_trading_day",
+      null,
+      "scalar",
+      "True if a date is a trading session (exchange defaults to 'XNYS')",
+      null,
+      {
+        "vgi.category": "sessions",
+        "vgi.doc_llm": "Test whether a date is a **trading session** on a given exchange. The `exchange` argument is optional and defaults to `'XNYS'` (NYSE); pass a MIC code (e.g. `'XLON'` for the London Stock Exchange, `'XTKS'` for Tokyo) for another market. Each exchange has its own holiday/weekend calendar via the `exchange-calendars` library. Returns `BOOLEAN` per row (`NULL` date -> `NULL`); dates outside the calendar's coverage window return `NULL`. List valid MIC codes with `tcal.exchanges`.",
+        "vgi.doc_md": "## is_trading_day(date[, exchange])\n\nTrue if `date` is a **trading session**; `exchange` defaults to `'XNYS'` (MIC code, e.g. `'XLON'`).\n\nPer-row `BOOLEAN`; `NULL` outside the calendar window. See `tcal.exchanges` for codes.",
+        "vgi.example_queries": "[{\"description\": \"Is 2026-12-28 a London Stock Exchange session?\", \"sql\": \"SELECT tcal.main.is_trading_day(DATE '2026-12-28', 'XLON')\"}]",
+        "vgi.keywords": "[\"is trading day\", \"exchange session\", \"market open\", \"london session\", \"xlon\", \"mic code\", \"stock exchange calendar\"]",
+        "vgi.title": "Is Trading Day On Exchange"
+      },
+      "BOOLEAN",
+      [
+        "date"
+      ],
+      [
+        "DATE"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22728,
+      [],
+      "CONSISTENT",
+      [
+        "calendar",
+        "trading"
+      ]
+    ],
+    [
+      "tcal",
+      "22592",
+      "main",
+      "is_trading_day",
+      null,
+      "scalar",
+      "True if a date is a trading session on an exchange",
+      null,
+      {
+        "vgi.category": "sessions",
+        "vgi.doc_llm": "Test whether a date is a **trading session** on a given exchange. The `exchange` argument is optional and defaults to `'XNYS'` (NYSE); pass a MIC code (e.g. `'XLON'` for the London Stock Exchange, `'XTKS'` for Tokyo) for another market. Each exchange has its own holiday/weekend calendar via the `exchange-calendars` library. Returns `BOOLEAN` per row (`NULL` date -> `NULL`); dates outside the calendar's coverage window return `NULL`. List valid MIC codes with `tcal.exchanges`.",
+        "vgi.doc_md": "## is_trading_day(date[, exchange])\n\nTrue if `date` is a **trading session**; `exchange` defaults to `'XNYS'` (MIC code, e.g. `'XLON'`).\n\nPer-row `BOOLEAN`; `NULL` outside the calendar window. See `tcal.exchanges` for codes.",
+        "vgi.example_queries": "[{\"description\": \"Is 2026-12-28 a London Stock Exchange session?\", \"sql\": \"SELECT tcal.main.is_trading_day(DATE '2026-12-28', 'XLON')\"}]",
+        "vgi.keywords": "[\"is trading day\", \"exchange session\", \"market open\", \"london session\", \"xlon\", \"mic code\", \"stock exchange calendar\"]",
+        "vgi.title": "Is Trading Day On Exchange"
+      },
+      "BOOLEAN",
+      [
+        "date",
+        "exchange"
+      ],
+      [
+        "DATE",
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22728,
+      [],
+      "CONSISTENT",
+      [
+        "calendar",
+        "trading"
+      ]
+    ],
+    [
+      "tcal",
+      "22592",
+      "main",
+      "market_close",
+      null,
+      "scalar",
+      "UTC market-close instant for a date, NULL if not a session (exchange 'XNYS')",
+      null,
+      {
+        "vgi.category": "market-hours",
+        "vgi.doc_llm": "Return the **market-close instant** for a date, as a UTC `TIMESTAMPTZ`, or `NULL` if it is not a session. The `exchange` argument is optional and defaults to `'XNYS'` (NYSE); pass a MIC code (e.g. `'XLON'`) for another market. The close reflects early-close half-days for that exchange. Timezone-aware (UTC), DST-correct, directly comparable across exchanges. Returns `NULL` for non-sessions / out-of-window dates. List valid codes with `tcal.exchanges`.",
+        "vgi.doc_md": "## market_close(date[, exchange])\n\n**UTC close instant** (`TIMESTAMPTZ`) for a session, else `NULL`; `exchange` defaults to `'XNYS'` (e.g. `'XLON'`).\n\nReflects that exchange's early closes; timezone-aware (UTC). See `tcal.exchanges` and `is_early_close`.",
+        "vgi.example_queries": "[{\"description\": \"London close on 2026-01-02\", \"sql\": \"SELECT tcal.main.market_close(DATE '2026-01-02', 'XLON')\"}]",
+        "vgi.keywords": "[\"market close\", \"exchange closing\", \"session close\", \"early close\", \"london close\", \"xlon\", \"close time\", \"utc timestamp\", \"mic code\"]",
+        "vgi.title": "Market Close Instant On Exchange"
+      },
+      "TIMESTAMP WITH TIME ZONE",
+      [
+        "date"
+      ],
+      [
+        "DATE"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22729,
+      [],
+      "CONSISTENT",
+      [
+        "calendar",
+        "trading"
+      ]
+    ],
+    [
+      "tcal",
+      "22592",
+      "main",
+      "market_close",
+      null,
+      "scalar",
+      "UTC market-close instant for a date on an exchange, NULL if not a session",
+      null,
+      {
+        "vgi.category": "market-hours",
+        "vgi.doc_llm": "Return the **market-close instant** for a date, as a UTC `TIMESTAMPTZ`, or `NULL` if it is not a session. The `exchange` argument is optional and defaults to `'XNYS'` (NYSE); pass a MIC code (e.g. `'XLON'`) for another market. The close reflects early-close half-days for that exchange. Timezone-aware (UTC), DST-correct, directly comparable across exchanges. Returns `NULL` for non-sessions / out-of-window dates. List valid codes with `tcal.exchanges`.",
+        "vgi.doc_md": "## market_close(date[, exchange])\n\n**UTC close instant** (`TIMESTAMPTZ`) for a session, else `NULL`; `exchange` defaults to `'XNYS'` (e.g. `'XLON'`).\n\nReflects that exchange's early closes; timezone-aware (UTC). See `tcal.exchanges` and `is_early_close`.",
+        "vgi.example_queries": "[{\"description\": \"London close on 2026-01-02\", \"sql\": \"SELECT tcal.main.market_close(DATE '2026-01-02', 'XLON')\"}]",
+        "vgi.keywords": "[\"market close\", \"exchange closing\", \"session close\", \"early close\", \"london close\", \"xlon\", \"close time\", \"utc timestamp\", \"mic code\"]",
+        "vgi.title": "Market Close Instant On Exchange"
+      },
+      "TIMESTAMP WITH TIME ZONE",
+      [
+        "date",
+        "exchange"
+      ],
+      [
+        "DATE",
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22729,
+      [],
+      "CONSISTENT",
+      [
+        "calendar",
+        "trading"
+      ]
+    ],
+    [
+      "tcal",
+      "22592",
+      "main",
+      "market_open",
+      null,
+      "scalar",
+      "UTC market-open instant for a date, NULL if not a session (exchange 'XNYS')",
+      null,
+      {
+        "vgi.category": "market-hours",
+        "vgi.doc_llm": "Return the **market-open instant** for a date as a UTC `TIMESTAMPTZ`, or `NULL` if it is not a session. The `exchange` argument is optional and defaults to `'XNYS'` (NYSE); pass a MIC code (e.g. `'XLON'`) for another market. The instant is timezone-aware (UTC) so it is directly comparable across exchanges and DST. Returns `NULL` for non-sessions and out-of-window dates. List valid codes with `tcal.exchanges`.",
+        "vgi.doc_md": "## market_open(date[, exchange])\n\n**UTC open instant** (`TIMESTAMPTZ`) for a session, else `NULL`; `exchange` defaults to `'XNYS'` (e.g. `'XLON'`).\n\nTimezone-aware (UTC), DST-correct. See `tcal.exchanges` and `market_close`.",
+        "vgi.example_queries": "[{\"description\": \"London open on 2026-01-02\", \"sql\": \"SELECT tcal.main.market_open(DATE '2026-01-02', 'XLON')\"}]",
+        "vgi.keywords": "[\"market open\", \"exchange opening\", \"session open\", \"london open\", \"xlon\", \"trading hours\", \"utc timestamp\", \"mic code\"]",
+        "vgi.title": "Market Open Instant On Exchange"
+      },
+      "TIMESTAMP WITH TIME ZONE",
+      [
+        "date"
+      ],
+      [
+        "DATE"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22730,
+      [],
+      "CONSISTENT",
+      [
+        "calendar",
+        "trading"
+      ]
+    ],
+    [
+      "tcal",
+      "22592",
+      "main",
+      "market_open",
+      null,
+      "scalar",
+      "UTC market-open instant for a date on an exchange, NULL if not a session",
+      null,
+      {
+        "vgi.category": "market-hours",
+        "vgi.doc_llm": "Return the **market-open instant** for a date as a UTC `TIMESTAMPTZ`, or `NULL` if it is not a session. The `exchange` argument is optional and defaults to `'XNYS'` (NYSE); pass a MIC code (e.g. `'XLON'`) for another market. The instant is timezone-aware (UTC) so it is directly comparable across exchanges and DST. Returns `NULL` for non-sessions and out-of-window dates. List valid codes with `tcal.exchanges`.",
+        "vgi.doc_md": "## market_open(date[, exchange])\n\n**UTC open instant** (`TIMESTAMPTZ`) for a session, else `NULL`; `exchange` defaults to `'XNYS'` (e.g. `'XLON'`).\n\nTimezone-aware (UTC), DST-correct. See `tcal.exchanges` and `market_close`.",
+        "vgi.example_queries": "[{\"description\": \"London open on 2026-01-02\", \"sql\": \"SELECT tcal.main.market_open(DATE '2026-01-02', 'XLON')\"}]",
+        "vgi.keywords": "[\"market open\", \"exchange opening\", \"session open\", \"london open\", \"xlon\", \"trading hours\", \"utc timestamp\", \"mic code\"]",
+        "vgi.title": "Market Open Instant On Exchange"
+      },
+      "TIMESTAMP WITH TIME ZONE",
+      [
+        "date",
+        "exchange"
+      ],
+      [
+        "DATE",
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22730,
+      [],
+      "CONSISTENT",
+      [
+        "calendar",
+        "trading"
+      ]
+    ],
+    [
+      "tcal",
+      "22592",
+      "main",
+      "next_trading_day",
+      null,
+      "scalar",
+      "First trading session strictly after a date (exchange 'XNYS')",
+      null,
+      {
+        "vgi.category": "sessions",
+        "vgi.doc_llm": "Return the **first trading session strictly after** a date. The `exchange` argument is optional and defaults to `'XNYS'` (NYSE); pass a MIC code (e.g. `'XTKS'` for Tokyo) for another market. The input date is never returned; the search skips that exchange's weekends and holidays. Returns `DATE` per row (`NULL` date -> `NULL`); `NULL` if the result is outside the calendar's coverage window. List valid codes with `tcal.exchanges`.",
+        "vgi.doc_md": "## next_trading_day(date[, exchange])\n\nFirst **session strictly after** `date`; `exchange` defaults to `'XNYS'` (e.g. `'XTKS'`).\n\nSkips that exchange's weekends + holidays. Per-row `DATE`. See `tcal.exchanges`.",
+        "vgi.example_queries": "[{\"description\": \"Next Tokyo session after New Year's Day\", \"sql\": \"SELECT tcal.main.next_trading_day(DATE '2026-01-01', 'XTKS')\"}]",
+        "vgi.keywords": "[\"next trading day\", \"exchange next session\", \"roll forward\", \"tokyo session\", \"xtks\", \"next market open\", \"mic code\"]",
+        "vgi.title": "Next Trading Day On Exchange"
+      },
+      "DATE",
+      [
+        "date"
+      ],
+      [
+        "DATE"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22731,
+      [],
+      "CONSISTENT",
+      [
+        "calendar",
+        "trading"
+      ]
+    ],
+    [
+      "tcal",
+      "22592",
+      "main",
+      "next_trading_day",
+      null,
+      "scalar",
+      "First trading session strictly after a date on an exchange",
+      null,
+      {
+        "vgi.category": "sessions",
+        "vgi.doc_llm": "Return the **first trading session strictly after** a date. The `exchange` argument is optional and defaults to `'XNYS'` (NYSE); pass a MIC code (e.g. `'XTKS'` for Tokyo) for another market. The input date is never returned; the search skips that exchange's weekends and holidays. Returns `DATE` per row (`NULL` date -> `NULL`); `NULL` if the result is outside the calendar's coverage window. List valid codes with `tcal.exchanges`.",
+        "vgi.doc_md": "## next_trading_day(date[, exchange])\n\nFirst **session strictly after** `date`; `exchange` defaults to `'XNYS'` (e.g. `'XTKS'`).\n\nSkips that exchange's weekends + holidays. Per-row `DATE`. See `tcal.exchanges`.",
+        "vgi.example_queries": "[{\"description\": \"Next Tokyo session after New Year's Day\", \"sql\": \"SELECT tcal.main.next_trading_day(DATE '2026-01-01', 'XTKS')\"}]",
+        "vgi.keywords": "[\"next trading day\", \"exchange next session\", \"roll forward\", \"tokyo session\", \"xtks\", \"next market open\", \"mic code\"]",
+        "vgi.title": "Next Trading Day On Exchange"
+      },
+      "DATE",
+      [
+        "date",
+        "exchange"
+      ],
+      [
+        "DATE",
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22731,
+      [],
+      "CONSISTENT",
+      [
+        "calendar",
+        "trading"
+      ]
+    ],
+    [
+      "tcal",
+      "22592",
+      "main",
+      "previous_trading_day",
+      null,
+      "scalar",
+      "Last trading session strictly before a date (exchange 'XNYS')",
+      null,
+      {
+        "vgi.category": "sessions",
+        "vgi.doc_llm": "Return the **last trading session strictly before** a date. The `exchange` argument is optional and defaults to `'XNYS'` (NYSE); pass a MIC code (e.g. `'XLON'` for London) for another market. The input date is never returned; the search skips that exchange's weekends and holidays. Returns `DATE` per row (`NULL` date -> `NULL`); `NULL` if outside the coverage window. List valid codes with `tcal.exchanges`.",
+        "vgi.doc_md": "## previous_trading_day(date[, exchange])\n\nLast **session strictly before** `date`; `exchange` defaults to `'XNYS'` (e.g. `'XLON'`).\n\nSkips that exchange's weekends + holidays. Per-row `DATE`. See `tcal.exchanges`.",
+        "vgi.example_queries": "[{\"description\": \"Last London session before New Year's Day\", \"sql\": \"SELECT tcal.main.previous_trading_day(DATE '2026-01-01', 'XLON')\"}]",
+        "vgi.keywords": "[\"previous trading day\", \"exchange prior session\", \"roll back\", \"london session\", \"xlon\", \"prior market open\", \"mic code\"]",
+        "vgi.title": "Previous Trading Day On Exchange"
+      },
+      "DATE",
+      [
+        "date"
+      ],
+      [
+        "DATE"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22732,
+      [],
+      "CONSISTENT",
+      [
+        "calendar",
+        "trading"
+      ]
+    ],
+    [
+      "tcal",
+      "22592",
+      "main",
+      "previous_trading_day",
+      null,
+      "scalar",
+      "Last trading session strictly before a date on an exchange",
+      null,
+      {
+        "vgi.category": "sessions",
+        "vgi.doc_llm": "Return the **last trading session strictly before** a date. The `exchange` argument is optional and defaults to `'XNYS'` (NYSE); pass a MIC code (e.g. `'XLON'` for London) for another market. The input date is never returned; the search skips that exchange's weekends and holidays. Returns `DATE` per row (`NULL` date -> `NULL`); `NULL` if outside the coverage window. List valid codes with `tcal.exchanges`.",
+        "vgi.doc_md": "## previous_trading_day(date[, exchange])\n\nLast **session strictly before** `date`; `exchange` defaults to `'XNYS'` (e.g. `'XLON'`).\n\nSkips that exchange's weekends + holidays. Per-row `DATE`. See `tcal.exchanges`.",
+        "vgi.example_queries": "[{\"description\": \"Last London session before New Year's Day\", \"sql\": \"SELECT tcal.main.previous_trading_day(DATE '2026-01-01', 'XLON')\"}]",
+        "vgi.keywords": "[\"previous trading day\", \"exchange prior session\", \"roll back\", \"london session\", \"xlon\", \"prior market open\", \"mic code\"]",
+        "vgi.title": "Previous Trading Day On Exchange"
+      },
+      "DATE",
+      [
+        "date",
+        "exchange"
+      ],
+      [
+        "DATE",
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22732,
+      [],
+      "CONSISTENT",
+      [
+        "calendar",
+        "trading"
+      ]
+    ],
+    [
+      "tcal",
+      "22592",
+      "main",
+      "trading_days_between",
+      null,
+      "scalar",
+      "Count trading sessions in [start, end), start inclusive (exchange 'XNYS')",
+      null,
+      {
+        "vgi.category": "sessions",
+        "vgi.doc_llm": "Count the number of **trading sessions in `[start, end)`** -- `start` inclusive, `end` exclusive -- skipping the exchange's weekends and holidays. The `exchange` argument is optional and defaults to `'XNYS'` (NYSE); pass a MIC code (e.g. `'XLON'`) for another market. Returns `INTEGER` per row (`NULL` if a bound is `NULL` or the span leaves the coverage window); negative if `end` precedes `start`. List valid codes with `tcal.exchanges`.",
+        "vgi.doc_md": "## trading_days_between(start, end[, exchange])\n\nCount **trading sessions in `[start, end)`**; `exchange` defaults to `'XNYS'` (e.g. `'XLON'`).\n\nSkips that exchange's weekends + holidays; negative if reversed. Per-row `INTEGER`. See `tcal.exchanges`.",
+        "vgi.example_queries": "[{\"description\": \"London sessions in January 2026\", \"sql\": \"SELECT tcal.main.trading_days_between(DATE '2026-01-01', DATE '2026-02-01', 'XLON')\"}]",
+        "vgi.keywords": "[\"trading days between\", \"exchange session count\", \"holding period\", \"london sessions\", \"xlon\", \"market days\", \"mic code\"]",
+        "vgi.title": "Count Trading Days Between On Exchange"
+      },
+      "INTEGER",
+      [
+        "start",
+        "end"
+      ],
+      [
+        "DATE",
+        "DATE"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22733,
+      [],
+      "CONSISTENT",
+      [
+        "calendar",
+        "trading"
+      ]
+    ],
+    [
+      "tcal",
+      "22592",
+      "main",
+      "trading_days_between",
+      null,
+      "scalar",
+      "Count trading sessions in [start, end) on an exchange (start inclusive)",
+      null,
+      {
+        "vgi.category": "sessions",
+        "vgi.doc_llm": "Count the number of **trading sessions in `[start, end)`** -- `start` inclusive, `end` exclusive -- skipping the exchange's weekends and holidays. The `exchange` argument is optional and defaults to `'XNYS'` (NYSE); pass a MIC code (e.g. `'XLON'`) for another market. Returns `INTEGER` per row (`NULL` if a bound is `NULL` or the span leaves the coverage window); negative if `end` precedes `start`. List valid codes with `tcal.exchanges`.",
+        "vgi.doc_md": "## trading_days_between(start, end[, exchange])\n\nCount **trading sessions in `[start, end)`**; `exchange` defaults to `'XNYS'` (e.g. `'XLON'`).\n\nSkips that exchange's weekends + holidays; negative if reversed. Per-row `INTEGER`. See `tcal.exchanges`.",
+        "vgi.example_queries": "[{\"description\": \"London sessions in January 2026\", \"sql\": \"SELECT tcal.main.trading_days_between(DATE '2026-01-01', DATE '2026-02-01', 'XLON')\"}]",
+        "vgi.keywords": "[\"trading days between\", \"exchange session count\", \"holding period\", \"london sessions\", \"xlon\", \"market days\", \"mic code\"]",
+        "vgi.title": "Count Trading Days Between On Exchange"
+      },
+      "INTEGER",
+      [
+        "start",
+        "end",
+        "exchange"
+      ],
+      [
+        "DATE",
+        "DATE",
+        "VARCHAR"
+      ],
+      null,
+      null,
+      false,
+      true,
+      null,
+      22733,
+      [],
+      "CONSISTENT",
+      [
+        "calendar",
+        "trading"
+      ]
+    ],
+    [
+      "tcal",
+      "22592",
+      "main",
+      "trading_schedule",
+      null,
+      "table",
+      "Per-session open/close/early-close schedule for a date range",
+      null,
+      {
+        "vgi.category": "market-hours",
+        "vgi.doc_llm": "Return the **per-session trading schedule over an inclusive `[start, end]` date range**: one row per session with its `session` date, UTC `market_open` and `market_close` instants, and an `is_early_close` flag. Takes `start` and `end` positionally plus an optional named `exchange` (default `'XNYS'`, NYSE). This is the set-returning companion to the scalar `market_open` / `market_close` / `is_early_close` functions -- use it to materialize a market-hours table for a period (note half-days like the day after Thanksgiving). Sessions outside the coverage window are omitted. See `tcal.exchanges` for MIC codes.",
+        "vgi.doc_md": "## trading_schedule(start, end, exchange := ...)\n\nPer-session **open / close / early-close schedule** over `[start, end]`.\n\nOne row per session: `session`, UTC `market_open`/`market_close`, `is_early_close`. `exchange` defaults to `'XNYS'`. Materializes a market-hours table (half-days flagged). See `tcal.exchanges`.",
+        "vgi.example_queries": "[{\"description\": \"Half-days in the NYSE Thanksgiving-week schedule, with their early close time.\", \"sql\": \"SELECT session, market_close FROM tcal.main.trading_schedule(DATE '2026-11-25', DATE '2026-11-30') WHERE is_early_close\"}, {\"description\": \"Every NYSE early-close half-day in 2026 with its early close time (UTC) and when the market next opens -- how long positions sit over the holiday break.\", \"sql\": \"SELECT sc.session, sc.market_close, tcal.main.next_trading_day(sc.session) AS next_session, tcal.main.market_open(tcal.main.next_trading_day(sc.session)) AS next_open FROM tcal.main.trading_schedule(DATE '2026-01-01', DATE '2026-12-31') AS sc WHERE sc.is_early_close ORDER BY sc.session\"}, {\"description\": \"Minutes of overlap between NYSE and London trading hours on sessions both trade in March-April 2026: usually 2 hours, widening to 3 hours for the weeks when the US has moved to daylight saving time and the UK has not.\", \"sql\": \"SELECT date_diff('minute', greatest(ny.market_open, ln.market_open), least(ny.market_close, ln.market_close)) AS overlap_minutes, count(*) AS n_sessions, min(ny.session) AS first_session FROM tcal.main.trading_schedule(DATE '2026-03-01', DATE '2026-04-30') AS ny JOIN tcal.main.trading_schedule(DATE '2026-03-01', DATE '2026-04-30', exchange := 'XLON') AS ln USING (session) GROUP BY overlap_minutes ORDER BY first_session\"}]",
+        "vgi.keywords": "[\"trading schedule\", \"market hours\", \"open close times\", \"session schedule\", \"early close\", \"half day\", \"trading hours table\", \"nyse schedule\"]",
+        "vgi.result_columns_schema": "[{\"name\": \"session\", \"type\": \"DATE\", \"description\": \"Trading session date.\"}, {\"name\": \"market_open\", \"type\": \"TIMESTAMPTZ\", \"description\": \"UTC market-open instant.\"}, {\"name\": \"market_close\", \"type\": \"TIMESTAMPTZ\", \"description\": \"UTC market-close instant.\"}, {\"name\": \"is_early_close\", \"type\": \"BOOLEAN\", \"description\": \"True if the session closes early.\"}]",
+        "vgi.title": "Trading Schedule For Range"
+      },
+      null,
+      [
+        "start",
+        "end",
+        "exchange"
+      ],
+      [
+        "DATE",
+        "DATE",
+        "VARCHAR"
+      ],
+      null,
+      null,
+      null,
+      true,
+      null,
+      22734,
+      [],
+      null,
+      [
+        "calendar",
+        "trading"
+      ]
+    ],
+    [
+      "tcal",
+      "22592",
+      "main",
+      "trading_sessions",
+      null,
+      "table",
+      "Every trading session in an inclusive [start, end] range",
+      null,
+      {
+        "vgi.category": "sessions",
+        "vgi.doc_llm": "Enumerate **every trading session in an inclusive `[start, end]` date range**, one per row -- the days the market is open, excluding weekends and exchange holidays. Takes `start` and `end` positionally plus an optional named `exchange` (default `'XNYS'`, NYSE). Both bounds are inclusive. Use it to expand a range into a session series you can join against, count, or window over. Dates outside the `exchange-calendars` coverage window simply do not appear. For other markets pass `exchange`; see `tcal.exchanges` for MIC codes.",
+        "vgi.doc_md": "## trading_sessions(start, end, exchange := ...)\n\nEvery **trading session in the inclusive `[start, end]` range**, one per row.\n\nOpen days only (no weekends/holidays); `exchange` defaults to `'XNYS'`. Expand a range into a session series for joins/counts. See `tcal.exchanges`.",
+        "vgi.example_queries": "[{\"description\": \"Count the NYSE trading sessions in January 2026.\", \"sql\": \"SELECT count(*) AS n_sessions FROM tcal.main.trading_sessions(DATE '2026-01-01', DATE '2026-01-31')\"}, {\"description\": \"The last London Stock Exchange sessions of January 2026 (26th onward).\", \"sql\": \"SELECT session FROM tcal.main.trading_sessions(DATE '2026-01-01', DATE '2026-01-31', exchange := 'XLON') WHERE session >= DATE '2026-01-26'\"}, {\"description\": \"NYSE sessions in 2026 on which the London Stock Exchange is closed (UK bank holidays such as Easter Monday and the Boxing Day substitute) -- days a US/UK pairs desk trades only one leg.\", \"sql\": \"SELECT s.session FROM tcal.main.trading_sessions(DATE '2026-01-01', DATE '2026-12-31') AS s WHERE NOT tcal.main.is_trading_day(s.session, 'XLON') ORDER BY s.session\"}, {\"description\": \"T+1 settlement date for a trade on each NYSE session of Thanksgiving week 2026 -- the Wednesday trade settles on Friday because the Thanksgiving holiday is skipped.\", \"sql\": \"SELECT s.session AS trade_date, tcal.main.add_trading_days(s.session, 1) AS settles_t1 FROM tcal.main.trading_sessions(DATE '2026-11-23', DATE '2026-11-30') AS s ORDER BY s.session\"}]",
+        "vgi.keywords": "[\"trading sessions\", \"list sessions\", \"market days\", \"open days\", \"session series\", \"trading calendar\", \"nyse sessions\", \"date range\"]",
+        "vgi.result_columns_schema": "[{\"name\": \"session\", \"type\": \"DATE\", \"description\": \"A trading session date in the range.\"}]",
+        "vgi.title": "Trading Sessions In Range"
+      },
+      null,
+      [
+        "start",
+        "end",
+        "exchange"
+      ],
+      [
+        "DATE",
+        "DATE",
+        "VARCHAR"
+      ],
+      null,
+      null,
+      null,
+      true,
+      null,
+      22735,
+      [],
+      null,
+      [
+        "calendar",
+        "trading"
+      ]
+    ]
+  ]
+}

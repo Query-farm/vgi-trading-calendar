@@ -1,7 +1,7 @@
 {
-  "source": "Pinned exchange-calendars 4.13.2 through the real worker; no HTTP feed or replay fixture.",
+  "source": "Released VGI Trading Calendar v0.5.0, tested with exchange-calendars 4.13.3; no HTTP feed or replay fixture. Source tag pinned; transitive dependencies may resolve newer versions.",
   "window": "2026-10-19 through 2026-11-08 inclusive; XNYS and XLON",
   "semantics": "Modeled regular-session open/close instants. No observed trades, real-time halts, extended hours or guarantees of venue availability.",
-  "boundary_probes": "2026-10-24 tests a covered closed Saturday; 1900-01-01 probes outside the default calendar window.",
+  "boundary_probes": "2026-10-19 is a covered open Monday; 2026-10-24 a covered closed Saturday; 1900-01-01 is outside the default calendar window.",
   "synthetic_event_controls": "Two invented instants exactly at the first selected shared interval start/end verify half-open membership."
 }

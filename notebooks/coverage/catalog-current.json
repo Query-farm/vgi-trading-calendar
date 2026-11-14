@@ -1,0 +1,218 @@
+{
+  "schema_version": 1,
+  "repository": "Query-farm/vgi-trading-calendar",
+  "revision": "e69ece1ac91d73e18737dc8544f4c7ddf80f07e3",
+  "captured_at": "2026-11-14T21:06:38.638171+00:00",
+  "default_schema": "main",
+  "scope": "all_public_functions_and_tables",
+  "complete": true,
+  "evidence": [
+    {
+      "path": "coverage/current-functions.json",
+      "sha256": "09ce9dd08fc2b7331f569c7f0a6a1cbf01f5323ce2c2baaa4875a30600a6269f",
+      "description": "Complete worker-filtered functions export through actual published Haybarn"
+    },
+    {
+      "path": "coverage/current-tables.json",
+      "sha256": "2cf7bec4d21db51d5659dd67d9f18d9d61f8b7ec5ed86b91195f6c3d1fb58833",
+      "description": "Complete worker-filtered tables export through actual published Haybarn"
+    },
+    {
+      "path": "coverage/current-views.json",
+      "sha256": "b7be1b9af667086c3e7cff01cfea20248f2147e4b9d7d370c4d640f2c6b70438",
+      "description": "Complete worker-filtered views export through actual published Haybarn"
+    }
+  ],
+  "objects": [
+    {
+      "schema": "main",
+      "name": "add_trading_days",
+      "kind": "function",
+      "signatures": [
+        "add_trading_days(DATE, INTEGER)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "add_trading_days",
+      "kind": "function",
+      "signatures": [
+        "add_trading_days(DATE, INTEGER, VARCHAR)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "is_early_close",
+      "kind": "function",
+      "signatures": [
+        "is_early_close(DATE)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "is_early_close",
+      "kind": "function",
+      "signatures": [
+        "is_early_close(DATE, VARCHAR)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "is_trading_day",
+      "kind": "function",
+      "signatures": [
+        "is_trading_day(DATE)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "is_trading_day",
+      "kind": "function",
+      "signatures": [
+        "is_trading_day(DATE, VARCHAR)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "market_close",
+      "kind": "function",
+      "signatures": [
+        "market_close(DATE)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "market_close",
+      "kind": "function",
+      "signatures": [
+        "market_close(DATE, VARCHAR)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "market_open",
+      "kind": "function",
+      "signatures": [
+        "market_open(DATE)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "market_open",
+      "kind": "function",
+      "signatures": [
+        "market_open(DATE, VARCHAR)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "next_trading_day",
+      "kind": "function",
+      "signatures": [
+        "next_trading_day(DATE)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "next_trading_day",
+      "kind": "function",
+      "signatures": [
+        "next_trading_day(DATE, VARCHAR)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "previous_trading_day",
+      "kind": "function",
+      "signatures": [
+        "previous_trading_day(DATE)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "previous_trading_day",
+      "kind": "function",
+      "signatures": [
+        "previous_trading_day(DATE, VARCHAR)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "trading_days_between",
+      "kind": "function",
+      "signatures": [
+        "trading_days_between(DATE, DATE)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "trading_days_between",
+      "kind": "function",
+      "signatures": [
+        "trading_days_between(DATE, DATE, VARCHAR)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "trading_schedule",
+      "kind": "function",
+      "signatures": [
+        "trading_schedule(DATE, DATE, VARCHAR)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "trading_sessions",
+      "kind": "function",
+      "signatures": [
+        "trading_sessions(DATE, DATE, VARCHAR)"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "exchanges",
+      "kind": "table",
+      "signatures": [
+        "TABLE"
+      ],
+      "authentication": "none",
+      "access": "read"
+    }
+  ]
+}

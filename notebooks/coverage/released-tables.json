@@ -1,0 +1,51 @@
+{
+  "query": "SELECT * FROM duckdb_tables() WHERE database_name='tcal' ORDER BY schema_name,table_name",
+  "columns": [
+    "database_name",
+    "database_oid",
+    "schema_name",
+    "schema_oid",
+    "table_name",
+    "table_oid",
+    "comment",
+    "tags",
+    "internal",
+    "temporary",
+    "has_primary_key",
+    "estimated_size",
+    "column_count",
+    "index_count",
+    "check_constraint_count",
+    "sql"
+  ],
+  "rows": [
+    [
+      "tcal",
+      22592,
+      "main",
+      22593,
+      "exchanges",
+      22796,
+      "Discovery table of every supported stock-exchange trading-calendar MIC code.",
+      {
+        "category": "trading-calendar",
+        "domain": "date-and-time",
+        "topic": "supported-exchanges",
+        "vgi.category": "discovery",
+        "vgi.doc_llm": "A ready-to-scan **discovery table** of every supported stock-exchange trading calendar, one MIC code per row. These are the codes you pass as the `exchange` argument to the trading functions (`is_trading_day`, `market_open`, `trading_schedule`, ...). Reference it directly by name (no parentheses) in a `FROM` clause. `'XNYS'` (NYSE) is merely the default; coverage spans roughly a hundred exchange calendars via `exchange-calendars` (e.g. `'XLON'` London, `'XTKS'` Tokyo, `'XNAS'` Nasdaq).",
+        "vgi.doc_md": "## exchanges (table)\n\nEvery supported **exchange MIC code**, one per row, as a plain table.\n\nThe valid `exchange` arguments for the trading functions; `'XNYS'` is just the default. Scan it directly by name (no parentheses). ~100 calendars (`'XLON'`, `'XTKS'`, `'XNAS'`, ...).",
+        "vgi.example_queries": "[{\"description\": \"List all supported exchange MIC codes.\", \"sql\": \"SELECT code FROM tcal.main.exchanges ORDER BY code\"}, {\"description\": \"Confirm the NYSE (XNYS) calendar is available.\", \"sql\": \"SELECT count(*) AS n FROM tcal.main.exchanges WHERE code = 'XNYS'\"}]",
+        "vgi.keywords": "[\"exchanges\", \"list exchanges\", \"mic codes\", \"supported exchanges\", \"trading calendars\", \"discovery\", \"xnys xlon xtks\", \"stock exchange codes\", \"exchanges table\"]",
+        "vgi.title": "Supported Exchanges"
+      },
+      false,
+      false,
+      true,
+      0,
+      1,
+      1,
+      0,
+      "CREATE TABLE exchanges(code VARCHAR, PRIMARY KEY(code));"
+    ]
+  ]
+}

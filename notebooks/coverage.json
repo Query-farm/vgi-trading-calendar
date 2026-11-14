@@ -1,0 +1,243 @@
+{
+  "schema_version": 1,
+  "catalogs": {
+    "released": {
+      "path": "coverage/catalog-released.json",
+      "sha256": "f5bc113bf99df4969721ff1900f0de15521f94aa95ca0be6906fca3630943b93",
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_sympy",
+        "reviewed_at": "2026-11-14T21:17:44.557458+00:00",
+        "catalog_sha256": "f5bc113bf99df4969721ff1900f0de15521f94aa95ca0be6906fca3630943b93",
+        "notes": "Complete native function/table/view exports through actual published Haybarn attachments to public release/current Git revisions reconcile eleven logical names: ten function names with overloads merged, plus exchanges table; no views or capability exclusions. Current main adds composed metadata examples; core.py and scalars.py are unchanged and tables.py only adds metadata examples. Final notebook executes public v0.5.0 with tested exchange-calendars 4.13.3. Current-interface coverage is reviewed compatibility, not exact-current notebook execution."
+      }
+    },
+    "current": {
+      "path": "coverage/catalog-current.json",
+      "sha256": "fc0923574f9b5bf9078ea7c2630f1427cef80f7ac116aee857b91d6707c9bd85",
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_sympy",
+        "reviewed_at": "2026-11-14T21:17:44.557458+00:00",
+        "catalog_sha256": "fc0923574f9b5bf9078ea7c2630f1427cef80f7ac116aee857b91d6707c9bd85",
+        "notes": "Complete native function/table/view exports through actual published Haybarn attachments to public release/current Git revisions reconcile eleven logical names: ten function names with overloads merged, plus exchanges table; no views or capability exclusions. Current main adds composed metadata examples; core.py and scalars.py are unchanged and tables.py only adds metadata examples. Final notebook executes public v0.5.0 with tested exchange-calendars 4.13.3. Current-interface coverage is reviewed compatibility, not exact-current notebook execution."
+      }
+    }
+  },
+  "notebooks": [
+    {
+      "path": "01_cross_market_utc_overlap.ipynb",
+      "sha256": "072b1bfdb6298602f6d9896ed564f1e4ed171bb36d1ee8fb806006579327fe8e",
+      "execution": {
+        "path": "coverage/run-01.json",
+        "sha256": "8cfbc0c7ea8f64cbe46cb4fa64107baab1778f80f26a6a8d1281f4169f902d74"
+      }
+    }
+  ],
+  "examples": [
+    {
+      "object": {
+        "schema": "main",
+        "name": "exchanges"
+      },
+      "notebook": "01_cross_market_utc_overlap.ipynb",
+      "sql": [
+        {
+          "cell": "fd3b965b",
+          "reference": "tcal.main.exchanges"
+        }
+      ],
+      "narrative_cells": [
+        "a4194b16"
+      ],
+      "result_cells": [
+        "fd3b965b"
+      ],
+      "interpretation_cells": [
+        "discovery-finding"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_sympy",
+        "reviewed_at": "2026-11-14T21:17:44.557458+00:00",
+        "notebook_sha256": "072b1bfdb6298602f6d9896ed564f1e4ed171bb36d1ee8fb806006579327fe8e",
+        "catalog_sha256": [
+          "f5bc113bf99df4969721ff1900f0de15521f94aa95ca0be6906fca3630943b93",
+          "fc0923574f9b5bf9078ea7c2630f1427cef80f7ac116aee857b91d6707c9bd85"
+        ],
+        "purpose": "Confirm that both chosen exchange codes are supported before asking for their schedules.",
+        "finding": "The discovery relation supplies XLON and XNYS, materialized as selected_exchanges. The next SQL guard requires both unique codes before schedule retrieval; support for a code does not assert coverage or an open session on a date."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "trading_schedule"
+      },
+      "notebook": "01_cross_market_utc_overlap.ipynb",
+      "sql": [
+        {
+          "cell": "schedules-query",
+          "reference": "tcal.main.trading_schedule"
+        }
+      ],
+      "narrative_cells": [
+        "discovery-finding"
+      ],
+      "result_cells": [
+        "85bf0e07"
+      ],
+      "interpretation_cells": [
+        "da1e96a2"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_sympy",
+        "reviewed_at": "2026-11-14T21:17:44.557458+00:00",
+        "notebook_sha256": "072b1bfdb6298602f6d9896ed564f1e4ed171bb36d1ee8fb806006579327fe8e",
+        "catalog_sha256": [
+          "f5bc113bf99df4969721ff1900f0de15521f94aa95ca0be6906fca3630943b93",
+          "fc0923574f9b5bf9078ea7c2630f1427cef80f7ac116aee857b91d6707c9bd85"
+        ],
+        "purpose": "Intersect modeled London and New York sessions using actual UTC boundaries over a fixed three-week window.",
+        "finding": "The selected default week has five joint sessions and ten shared hours; the later week has fifteen shared hours while individual session lengths remain 6.5/8.5 hours. Both schedules are retrieved once and reused; covered closed dates remain on the date spine and no live trading activity is inferred."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "is_trading_day"
+      },
+      "notebook": "01_cross_market_utc_overlap.ipynb",
+      "sql": [
+        {
+          "cell": "schedules-query",
+          "reference": "tcal.main.is_trading_day"
+        }
+      ],
+      "narrative_cells": [
+        "discovery-finding"
+      ],
+      "result_cells": [
+        "a9aa18b0"
+      ],
+      "interpretation_cells": [
+        "b2554e6f"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_sympy",
+        "reviewed_at": "2026-11-14T21:17:44.557458+00:00",
+        "notebook_sha256": "072b1bfdb6298602f6d9896ed564f1e4ed171bb36d1ee8fb806006579327fe8e",
+        "catalog_sha256": [
+          "f5bc113bf99df4969721ff1900f0de15521f94aa95ca0be6906fca3630943b93",
+          "fc0923574f9b5bf9078ea7c2630f1427cef80f7ac116aee857b91d6707c9bd85"
+        ],
+        "purpose": "Distinguish a closed date from missing calendar coverage before assigning zero overlap.",
+        "finding": "All 21 reference dates are covered, with six closed weekend dates and fifteen joint-session dates. Separate controls return true for a Monday, false for Saturday and NULL for 1900-01-01. Missing schedule rows alone cannot distinguish closure from unknown coverage."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "market_open"
+      },
+      "notebook": "01_cross_market_utc_overlap.ipynb",
+      "sql": [
+        {
+          "cell": "b9418add",
+          "reference": "tcal.main.market_open"
+        }
+      ],
+      "narrative_cells": [
+        "b2554e6f"
+      ],
+      "result_cells": [
+        "bc49f1b8"
+      ],
+      "interpretation_cells": [
+        "b2554e6f"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_sympy",
+        "reviewed_at": "2026-11-14T21:17:44.557458+00:00",
+        "notebook_sha256": "072b1bfdb6298602f6d9896ed564f1e4ed171bb36d1ee8fb806006579327fe8e",
+        "catalog_sha256": [
+          "f5bc113bf99df4969721ff1900f0de15521f94aa95ca0be6906fca3630943b93",
+          "fc0923574f9b5bf9078ea7c2630f1427cef80f7ac116aee857b91d6707c9bd85"
+        ],
+        "purpose": "Compare a covered-session opening instant with dates that have no opening timestamp.",
+        "finding": "The 2026-10-19 New York control opens at 13:30 UTC, matching the materialized schedule. Saturday and the out-of-window 1900 date both have NULL openings but different session flags. An absent timestamp is not enough to establish closure; session dates and UTC instants are different quantities."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "market_close"
+      },
+      "notebook": "01_cross_market_utc_overlap.ipynb",
+      "sql": [
+        {
+          "cell": "b9418add",
+          "reference": "tcal.main.market_close"
+        }
+      ],
+      "narrative_cells": [
+        "b2554e6f"
+      ],
+      "result_cells": [
+        "bc49f1b8"
+      ],
+      "interpretation_cells": [
+        "b2554e6f"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_sympy",
+        "reviewed_at": "2026-11-14T21:17:44.557458+00:00",
+        "notebook_sha256": "072b1bfdb6298602f6d9896ed564f1e4ed171bb36d1ee8fb806006579327fe8e",
+        "catalog_sha256": [
+          "f5bc113bf99df4969721ff1900f0de15521f94aa95ca0be6906fca3630943b93",
+          "fc0923574f9b5bf9078ea7c2630f1427cef80f7ac116aee857b91d6707c9bd85"
+        ],
+        "purpose": "Retain an actual timezone-aware closing instant and distinguish its absence from a closed-session assertion.",
+        "finding": "The covered Monday closes at 20:00 UTC and matches the schedule, while closed and uncovered dates have no closing timestamp. Invented events at the shared open and close verify half-open time membership; an exact closing instant is outside the modeled interval."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "trading_days_between"
+      },
+      "notebook": "01_cross_market_utc_overlap.ipynb",
+      "sql": [
+        {
+          "cell": "date-count-query",
+          "reference": "tcal.main.trading_days_between"
+        }
+      ],
+      "narrative_cells": [
+        "b2554e6f"
+      ],
+      "result_cells": [
+        "date-count-query"
+      ],
+      "interpretation_cells": [
+        "date-count-finding"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root/notebooks_sympy",
+        "reviewed_at": "2026-11-14T21:17:44.557458+00:00",
+        "notebook_sha256": "072b1bfdb6298602f6d9896ed564f1e4ed171bb36d1ee8fb806006579327fe8e",
+        "catalog_sha256": [
+          "f5bc113bf99df4969721ff1900f0de15521f94aa95ca0be6906fca3630943b93",
+          "fc0923574f9b5bf9078ea7c2630f1427cef80f7ac116aee857b91d6707c9bd85"
+        ],
+        "purpose": "Reconcile half-open date counts with inclusive schedule endpoints without confusing counts and duration.",
+        "finding": "The half-open range 19 October\u20139 November contains fifteen New York sessions, equal to schedule rows through 8 November inclusive. The exclusive endpoint does not add the 9 November session; this count is not the shared time or a settlement guarantee."
+      }
+    }
+  ]
+}
