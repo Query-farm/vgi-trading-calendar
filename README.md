@@ -226,3 +226,7 @@ test/sql/
 Written by [Query.Farm](https://query.farm).
 
 Copyright 2026 Query Farm LLC - https://query.farm
+
+## Executable notebook
+
+[Cross-market UTC overlap](notebooks/README.md) compares New York and London regular-session intervals across autumn clock changes, with visible SQL, coverage controls and a reproducible week-shift experiment.
