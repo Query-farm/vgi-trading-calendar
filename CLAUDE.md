@@ -83,8 +83,9 @@ overload instead. (This same constraint shapes every sibling worker.)
    `TIMESTAMPTZ '... +00'` literals so they're timezone-independent.
 5. **`exchange-calendars` coverage window is bounded** (~20yr back to ~1yr
    ahead). `core.py` is written bounds-safe via `searchsorted` on
-   `cal.sessions`, so out-of-window dates return `None`/empty rather than
-   raising. It also pulls in `pandas` + `numpy`; the calendar objects are
+   `cal.sessions`; `core._in_window` makes out-of-window scalars return
+   `None` (never `False` or a truncated count), and the table functions
+   return only in-window sessions. It also pulls in `pandas` + `numpy`; the calendar objects are
    `lru_cache`d per process (the state VGI's pooled worker amortizes).
 
 ## Testing

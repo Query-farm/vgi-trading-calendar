@@ -66,32 +66,56 @@ def _to_utc_dt(ts: _pd.Timestamp) -> _dt.datetime:
     return cast("_dt.datetime", ts.tz_convert("UTC").to_pydatetime())
 
 
+def _in_window(date: _dt.date, exchange: str, *, slack_days: int = 0) -> bool:
+    """True if ``date`` lies inside ``exchange``'s coverage window.
+
+    The window is ``[first_session, last_session + slack_days]``. Outside it
+    the library has no session data, so any answer would be a guess.
+    """
+    sess = _sessions(exchange)
+    if len(sess) == 0:
+        return False
+    ts = _ts(date)
+    return bool(sess[0] <= ts <= sess[-1] + _pd.Timedelta(days=slack_days))
+
+
 def list_exchanges() -> list[str]:
     """Every supported exchange MIC code, sorted."""
     return sorted(_xcals.get_calendar_names())
 
 
-def is_trading_day(date: _dt.date, exchange: str = DEFAULT_EXCHANGE) -> bool:
+def is_trading_day(date: _dt.date, exchange: str = DEFAULT_EXCHANGE) -> bool | None:
     """True if ``date`` is a trading session on ``exchange``.
 
-    Dates outside the calendar's coverage window are ``False``.
+    ``None`` for dates outside the calendar's coverage window: the library has
+    no data there, and ``False`` would wrongly claim the market was closed.
     """
-    sess = _sessions(exchange)
-    ts = _ts(date)
-    if len(sess) == 0 or ts < sess[0] or ts > sess[-1]:
-        return False
-    return bool(_calendar(exchange).is_session(ts))
+    if not _in_window(date, exchange):
+        return None
+    return bool(_calendar(exchange).is_session(_ts(date)))
 
 
 def next_trading_day(date: _dt.date, exchange: str = DEFAULT_EXCHANGE) -> _dt.date | None:
-    """The first trading session strictly **after** ``date`` (``None`` if none known)."""
+    """The first trading session strictly **after** ``date`` (``None`` if none known).
+
+    ``None`` when ``date`` precedes the coverage window, since unknown sessions
+    may lie between ``date`` and the first known one.
+    """
     sess = _sessions(exchange)
+    if len(sess) == 0 or _ts(date) < sess[0]:
+        return None
     i = int(sess.searchsorted(_ts(date), side="right"))
     return sess[i].date() if i < len(sess) else None
 
 
 def previous_trading_day(date: _dt.date, exchange: str = DEFAULT_EXCHANGE) -> _dt.date | None:
-    """The last trading session strictly **before** ``date`` (``None`` if none known)."""
+    """The last trading session strictly **before** ``date`` (``None`` if none known).
+
+    ``None`` when ``date`` is past the day after the coverage window ends, since
+    unknown sessions may lie between the last known one and ``date``.
+    """
+    if not _in_window(date, exchange, slack_days=1):
+        return None
     sess = _sessions(exchange)
     i = int(sess.searchsorted(_ts(date), side="left"))
     return sess[i - 1].date() if i > 0 else None
@@ -103,28 +127,34 @@ def add_trading_days(date: _dt.date, n: int, exchange: str = DEFAULT_EXCHANGE) -
     ``n == 0`` returns ``date`` unchanged even if it is not itself a session.
     Otherwise the result is the ``|n|``-th session strictly after (``n > 0``) or
     before (``n < 0``) ``date``. ``None`` if that session is outside the
-    calendar's coverage window.
+    calendar's coverage window, or if ``date`` itself is.
     """
     if n == 0:
         return date
+    if not _in_window(date, exchange):
+        return None
     sess = _sessions(exchange)
     ts = _ts(date)
     j = int(sess.searchsorted(ts, side="right")) + n - 1 if n > 0 else int(sess.searchsorted(ts, side="left")) + n
     return sess[j].date() if 0 <= j < len(sess) else None
 
 
-def trading_days_between(start: _dt.date, end: _dt.date, exchange: str = DEFAULT_EXCHANGE) -> int:
+def trading_days_between(start: _dt.date, end: _dt.date, exchange: str = DEFAULT_EXCHANGE) -> int | None:
     """Count trading sessions in ``[start, end)`` -- half-open, ``start`` inclusive.
 
     ``trading_days_between(d, d)`` is ``0``. If ``end`` is before ``start`` the
     count is negative (sessions counted backwards), mirroring how a date
-    difference behaves.
+    difference behaves. ``None`` if the span leaves the coverage window (the
+    exclusive bound may be the day after the last known session), because
+    the sessions out there are unknown and the count would come up short.
     """
     if start == end:
         return 0
-    sess = _sessions(exchange)
     sign = 1 if end > start else -1
     lo, hi = (start, end) if end > start else (end, start)
+    if not (_in_window(lo, exchange) and _in_window(hi, exchange, slack_days=1)):
+        return None
+    sess = _sessions(exchange)
     count = int(sess.searchsorted(_ts(hi), side="left")) - int(sess.searchsorted(_ts(lo), side="left"))
     return sign * count
 
@@ -143,10 +173,14 @@ def market_close(date: _dt.date, exchange: str = DEFAULT_EXCHANGE) -> _dt.dateti
     return _to_utc_dt(_calendar(exchange).session_close(_ts(date)))
 
 
-def is_early_close(date: _dt.date, exchange: str = DEFAULT_EXCHANGE) -> bool:
-    """True if ``date`` is a session that closes early (e.g. the day after US Thanksgiving)."""
+def is_early_close(date: _dt.date, exchange: str = DEFAULT_EXCHANGE) -> bool | None:
+    """True if ``date`` is a session that closes early (e.g. the day after US Thanksgiving).
+
+    ``False`` for a normal session; ``None`` for a non-session or a date outside
+    the coverage window, where "early close" has no meaning.
+    """
     if not is_trading_day(date, exchange):
-        return False
+        return None
     return _ts(date) in _calendar(exchange).early_closes
 
 

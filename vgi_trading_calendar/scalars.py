@@ -448,7 +448,8 @@ class TradingDaysBetweenFunction(ScalarFunction):
             "Count the number of **trading sessions in the half-open interval `[start, end)`** -- "
             "`start` inclusive, `end` exclusive -- skipping weekends and exchange holidays. This "
             "two-argument overload uses the default exchange `'XNYS'` (NYSE). Returns `INTEGER` per "
-            "row (`NULL` if a bound is `NULL`); the count is negative if `end` precedes `start`. "
+            "row (`NULL` if a bound is `NULL` or the span leaves the calendar's coverage window); "
+            "the count is negative if `end` precedes `start`. "
             "Use it to measure session-based durations (e.g. holding periods in trading days). For "
             "other markets use the exchange overload.",
             "## trading_days_between(start, end)\n\n"
@@ -491,7 +492,8 @@ class TradingDaysBetweenExchangeFunction(ScalarFunction):
             "`start` inclusive, `end` exclusive -- skipping the exchange's weekends and holidays. "
             "The `exchange` argument is optional and defaults to `'XNYS'` (NYSE); pass a MIC code "
             "(e.g. `'XLON'`) for another market. Returns `INTEGER` per "
-            "row (`NULL` if a bound is `NULL`); negative if `end` precedes `start`. List valid "
+            "row (`NULL` if a bound is `NULL` or the span leaves the coverage window); negative if "
+            "`end` precedes `start`. List valid "
             "codes with `tcal.exchanges`.",
             "## trading_days_between(start, end[, exchange])\n\n"
             "Count **trading sessions in `[start, end)`**; `exchange` defaults to `'XNYS'` (e.g. "

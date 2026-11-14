@@ -29,8 +29,45 @@ class TestIsTradingDay:
         assert core.is_trading_day(dt.date(2026, 7, 3), "XLON") is True
         assert core.is_trading_day(dt.date(2026, 7, 3), "XNYS") is False
 
-    def test_out_of_window_is_false_not_error(self) -> None:
-        assert core.is_trading_day(dt.date(1800, 1, 2)) is False
+    def test_out_of_window_is_none_not_false(self) -> None:
+        # No session data out there: an ordinary weekday must not read as "closed".
+        assert core.is_trading_day(dt.date(1800, 1, 2)) is None
+        assert core.is_trading_day(_far_future()) is None
+
+
+def _far_future() -> dt.date:
+    """A weekday well past the coverage window (which ends ~1 year ahead)."""
+    last = core._sessions("XNYS")[-1].date()
+    d = last + dt.timedelta(days=400)
+    while d.weekday() >= 5:
+        d += dt.timedelta(days=1)
+    return d
+
+
+class TestCoverageWindow:
+    def test_navigation_outside_window_is_none(self) -> None:
+        first = core._sessions("XNYS")[0].date()
+        assert core.next_trading_day(first - dt.timedelta(days=30)) is None
+        assert core.previous_trading_day(_far_future()) is None
+        assert core.add_trading_days(_far_future(), -1) is None
+        assert core.add_trading_days(dt.date(1800, 1, 2), 1) is None
+
+    def test_previous_from_day_after_last_session(self) -> None:
+        last = core._sessions("XNYS")[-1].date()
+        assert core.previous_trading_day(last + dt.timedelta(days=1)) == last
+
+    def test_count_leaving_window_is_none(self) -> None:
+        assert core.trading_days_between(dt.date(2026, 1, 2), _far_future()) is None
+        assert core.trading_days_between(_far_future(), dt.date(2026, 1, 2)) is None
+        assert core.trading_days_between(dt.date(1800, 1, 2), dt.date(2026, 1, 2)) is None
+
+    def test_count_up_to_day_after_last_session(self) -> None:
+        sess = core._sessions("XNYS")
+        last = sess[-1].date()
+        assert core.trading_days_between(sess[-3].date(), last + dt.timedelta(days=1)) == 3
+
+    def test_early_close_outside_window_is_none(self) -> None:
+        assert core.is_early_close(_far_future()) is None
 
 
 class TestNavigation:
@@ -83,6 +120,9 @@ class TestHoursAndEarlyClose:
 
     def test_regular_session_is_not_early_close(self) -> None:
         assert core.is_early_close(dt.date(2026, 1, 2)) is False
+
+    def test_non_session_early_close_is_none(self) -> None:
+        assert core.is_early_close(dt.date(2026, 1, 3)) is None  # Saturday
 
 
 class TestRangesAndDiscovery:

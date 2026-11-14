@@ -101,14 +101,14 @@ The split follows what the VGI SDK allows for each function shape:
 
 | Function | Form | Signature | Returns |
 | --- | --- | --- | --- |
-| `is_trading_day` | scalar | `(date DATE[, exchange])` | `BOOLEAN` |
+| `is_trading_day` | scalar | `(date DATE[, exchange])` | `BOOLEAN` (NULL outside the window) |
 | `next_trading_day` | scalar | `(date DATE[, exchange])` | `DATE` (NULL past the window) |
 | `previous_trading_day` | scalar | `(date DATE[, exchange])` | `DATE` (NULL past the window) |
-| `add_trading_days` | scalar | `(date DATE, n INT[, exchange])` | `DATE` |
-| `trading_days_between` | scalar | `(start DATE, end DATE[, exchange])` | `INT` |
+| `add_trading_days` | scalar | `(date DATE, n INT[, exchange])` | `DATE` (NULL outside the window) |
+| `trading_days_between` | scalar | `(start DATE, end DATE[, exchange])` | `INT` (NULL if the span leaves the window) |
 | `market_open` | scalar | `(date DATE[, exchange])` | `TIMESTAMPTZ` (UTC, NULL if not a session) |
 | `market_close` | scalar | `(date DATE[, exchange])` | `TIMESTAMPTZ` (UTC, NULL if not a session) |
-| `is_early_close` | scalar | `(date DATE[, exchange])` | `BOOLEAN` |
+| `is_early_close` | scalar | `(date DATE[, exchange])` | `BOOLEAN` (NULL if not a session) |
 | `trading_sessions` | table | `(start DATE, end DATE, exchange := 'XNYS')` | `(session DATE)` |
 | `trading_schedule` | table | `(start DATE, end DATE, exchange := 'XNYS')` | `(session DATE, market_open TIMESTAMPTZ, market_close TIMESTAMPTZ, is_early_close BOOLEAN)` |
 | `exchanges` | table | `()` | `(code VARCHAR)` |
@@ -146,7 +146,10 @@ session.
 
 Coverage is the `exchange-calendars` default window (roughly two decades back to
 about a year ahead — future market holidays are only defined so far); a date
-outside that window resolves to `NULL` / no rows rather than erroring.
+outside that window resolves to `NULL` rather than a guess: `is_trading_day`
+never claims an uncovered weekday is closed, and `trading_days_between` won't
+return a short count for a span that runs past the window. The table functions
+return only the sessions inside the window.
 
 ## Companion workers
 

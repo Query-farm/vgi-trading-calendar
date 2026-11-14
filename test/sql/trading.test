@@ -78,6 +78,21 @@ SELECT tcal.market_close(DATE '2026-11-27') = TIMESTAMPTZ '2026-11-27 18:00:00+0
 ----
 true
 
+# Non-sessions have no early-close answer.
+query I
+SELECT tcal.is_early_close(DATE '2026-01-03') IS NULL;
+----
+true
+
+# Outside the exchange-calendars coverage window the worker has no data:
+# NULL, never a guessed "closed" or a short count.
+query III
+SELECT tcal.is_trading_day(DATE '1800-01-02') IS NULL,
+       tcal.add_trading_days(DATE '1800-01-02', 1) IS NULL,
+       tcal.trading_days_between(DATE '1800-01-02', DATE '2026-01-02') IS NULL;
+----
+true	true	true
+
 # Hours are NULL on a non-session.
 query I
 SELECT tcal.market_open(DATE '2026-01-01') IS NULL;
