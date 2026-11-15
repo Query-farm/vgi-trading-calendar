@@ -103,7 +103,7 @@ _CATALOG_DESCRIPTION_MD = (
     "`'XNYS'` (NYSE) is merely the default argument, not a limit.\n\n"
     "Trading calendars are provided by "
     "[exchange-calendars](https://github.com/gerrymanoim/exchange_calendars) "
-    "([docs](https://exchange-calendars.readthedocs.io/)), the maintained successor to "
+    "([tutorials](https://github.com/gerrymanoim/exchange_calendars/tree/master/docs/tutorials)), the maintained successor to "
     "Quantopian's `trading_calendars`, covering roughly a hundred exchanges including early "
     "closes and holiday sessions. A **session** is a trading day; `market_open` / `market_close` "
     "are timezone-aware **UTC** instants. Coverage is the library's default window (roughly two "
