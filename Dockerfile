@@ -7,7 +7,7 @@
 # and offline (exchange-calendars), so there is no persistent state volume.
 # The worker (vgi_trading_calendar.worker) + vgi-python[http] come from the wheel.
 # syntax=docker/dockerfile:1
-FROM python:3.13-slim
+FROM python:3.14-slim
 
 ARG VERSION=0.0.0
 ARG GIT_COMMIT=unknown

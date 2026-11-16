@@ -98,7 +98,7 @@ make test                     # both
 uv run ruff check . && uv run mypy vgi_trading_calendar/
 ```
 
-`make test-sql` sets `VGI_TRADING_CALENDAR_WORKER="uv run --python 3.13
+`make test-sql` sets `VGI_TRADING_CALENDAR_WORKER="uv run --python 3.14
 trading_calendar_worker.py"`, puts `~/.local/bin` on PATH, and runs
 `haybarn-unittest --test-dir . "test/sql/*"`. Install the runner once with
 `uv tool install --prerelease allow 'haybarn-unittest>=2.0.0rc11,<2.1'`. **The SQL suite is authoritative** — unit
