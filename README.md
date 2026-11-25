@@ -20,7 +20,7 @@ Tokyo, and ~100 other exchanges. Trading calendars come from the
 
 ```sql
 INSTALL vgi FROM community; LOAD vgi;
-ATTACH 'tcal' (TYPE vgi, LOCATION 'uvx --from git+https://github.com/Query-farm/vgi-trading-calendar@v0.5.2 vgi-trading-calendar-worker');
+ATTACH 'tcal' (TYPE vgi, LOCATION 'uvx --from git+https://github.com/Query-farm/vgi-trading-calendar@v0.6.0 vgi-trading-calendar-worker');
 
 -- Default exchange is 'XNYS' (NYSE):
 SELECT tcal.is_trading_day(DATE '2026-01-01');            -- false (market holiday)
@@ -38,6 +38,8 @@ SELECT * FROM tcal.exchanges;                             -- ~100 supported MIC 
 > (`'XLON'` London, `'XTKS'` Tokyo, `'XNAS'` Nasdaq, …) as the `exchange`
 > argument.
 
+vgi-trading-calendar 0.6.0 speaks VGI protocol 3.4, so it needs Haybarn 2.0.1 or newer (Haybarn 2.0.0 loads a 3.3 `vgi` extension that cannot attach it).
+
 ## Quick start
 
 The worker isn't on PyPI; [uv](https://docs.astral.sh/uv/) runs it straight from a tagged release on GitHub. `uvx` builds an isolated environment on the first ATTACH and reuses it afterwards:
@@ -46,7 +48,7 @@ The worker isn't on PyPI; [uv](https://docs.astral.sh/uv/) runs it straight from
 INSTALL vgi FROM community;
 LOAD vgi;
 
-ATTACH 'tcal' AS tcal (TYPE vgi, LOCATION 'uvx --from git+https://github.com/Query-farm/vgi-trading-calendar@v0.5.2 vgi-trading-calendar-worker');
+ATTACH 'tcal' AS tcal (TYPE vgi, LOCATION 'uvx --from git+https://github.com/Query-farm/vgi-trading-calendar@v0.6.0 vgi-trading-calendar-worker');
 
 -- Whether a date is an NYSE trading session (New Year's Day is a holiday).
 SELECT tcal.main.is_trading_day(DATE '2026-01-01') AS is_session;
@@ -55,14 +57,14 @@ SELECT tcal.main.is_trading_day(DATE '2026-01-01') AS is_session;
 SELECT tcal.main.next_trading_day(DATE '2026-01-01') AS next_session;
 ```
 
-Change `@v0.5.2` to move to a newer release.
+Change `@v0.6.0` to move to a newer release.
 
 ### Other ways to run it
 
 - **Docker** (the image bundles the worker and its dependencies):
 
   ```sql
-  ATTACH 'tcal' AS tcal (TYPE vgi, LOCATION 'docker://ghcr.io/query-farm/vgi-trading-calendar:0.5.2');
+  ATTACH 'tcal' AS tcal (TYPE vgi, LOCATION 'docker://ghcr.io/query-farm/vgi-trading-calendar:0.6.0');
   ```
 
 - **From a local checkout** (`git clone https://github.com/Query-farm/vgi-trading-calendar`), point `LOCATION` at `uv run --project /path/to/vgi-trading-calendar vgi-trading-calendar-worker`.
